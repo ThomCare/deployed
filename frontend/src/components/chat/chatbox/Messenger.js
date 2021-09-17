@@ -90,7 +90,7 @@ const Messenger = ({ history }) => {
     const socket = useRef()
 
     useEffect(() => {
-        socket.current = io('/')
+        socket.current = io('http://thomcare.herokuapp.com')
 
         //arrival message
         socket.current.on("getMessage", (data) => {
