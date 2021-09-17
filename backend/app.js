@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser')
-
+const path = require('path')
 
 const errorMiddleware = require('./middlewares/errors');
 
@@ -47,7 +47,7 @@ app.use(errorMiddleware);
 
 //socket
 const http = require('http')
-const path = require('path')
+
 const socketio = require('socket.io')
 
 var cors = require('cors')
