@@ -39,9 +39,8 @@ const io = require('socket.io')(server, {
     }
 })
 
-const PORT = process.env.PORT || 8900
 
-server.listen(PORT, () => console.log(`Connected to port: ${PORT}`))
+
 // const io = require('socket.io')(PORT, {
 //     cors: {
 //         origin: 'http://localhost:3000',
