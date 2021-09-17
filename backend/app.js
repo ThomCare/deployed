@@ -58,7 +58,9 @@ const server = http.createServer(app)
 
 const io = socketio(server, {
     cors: {
-        origin: 'http://thomcare.herokuapp.com', // ip add of frontend
+        origin: 'http://thomcare.herokuapp.com',
+        methods: ["GET", "POST"],
+        credentials: true // ip add of frontend
     }
 })
 
