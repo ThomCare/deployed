@@ -53,9 +53,7 @@ const socketio = require('socket.io')
 var cors = require('cors')
 app.use(cors())
 
-const buildPath = path.join(__dirname + '/../../build')
-app.use(express.static(buildPath));
- 
+
 const server = http.createServer(app)
 
 const io = socketio(server, {
