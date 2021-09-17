@@ -41,7 +41,7 @@ app.use(cors())
 
 const io = socketio(server, {
     cors: {
-        origin: 'https://thomcare.herokuapp.com',
+        origin: '/',
         methods: ["GET", "POST"],
         credentials: true // ip add of frontend
     }
