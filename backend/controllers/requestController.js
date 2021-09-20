@@ -101,8 +101,9 @@ exports.requestTracker = catchAsyncErrors(async (req, res, next) => {
     const trackingNumber = req.body.trackingNumber
     const lastName = req.body.lastName
     const request = await Request.findOne({ trackingNumber })
-
+    
     if (!request) { return next(new ErrorHandler(`Request with Tracking Number: (${trackingNumber}) does not exist`)) }
+    
     if (request.requestorInfo.lastName !== lastName) { return next(new ErrorHandler(`Last name does not match with the request surname`)) }
 
     res.status(200).json({

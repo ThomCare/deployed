@@ -36,53 +36,48 @@ import {
     USER_DETAILS_FAIL
 } from '../constants/userConstants'
 
+function filter(currentPage, course, yearLevel, track, title, announcementType) {
+    let link = `/api/v1/announcements?page=${currentPage}`
+    
+    if (course) {
+        if (yearLevel) {
+            if (track) {
+                if (title) {
+        
+                } else if (announcementType) {
+            
+                }
+            } else if (title) {
+        
+            } else if (announcementType) {
+        
+            }
+        } else if (track) {
+            
+        } else if (title) {
+    
+        } else if (announcementType) {
+    
+        }
+    } else if (yearLevel) {
+
+    } else if (track) {
+        
+    } else if (title) {
+
+    } else if (announcementType) {
+
+    }
+    return link
+}
 //get all announcements
-export const getAnnouncements = (currentPage, course, yearLevel, track, title) => async(dispatch) => {
+export const getAnnouncements = (currentPage, course, yearLevel, track, title, announcementType) => async(dispatch) => {
     try {
         dispatch({
             type: ALL_ANNOUNCEMENTS_REQUEST
         })
 
-        let link = ``
-        
-        if (course === '' && yearLevel === '' && track  === '' && title === '')  {
-            link = `/api/v1/announcements?page=${currentPage}`
-        }
-        else {
-            if(course && yearLevel && track && title) {
-                link = `/api/v1/announcements?page=${currentPage}&course=${course}&yearLevel=${yearLevel}&track=${track}&keyword=${title}`
-            } else if (course && yearLevel && track) {
-                link = `/api/v1/announcements?page=${currentPage}&course=${course}&yearLevel=${yearLevel}&track=${track}`
-            } else if (course && track && title) {
-                link = `/api/v1/announcements?page=${currentPage}&course=${course}&track=${track}&keyword=${title}`
-            } else if (yearLevel && course && title) {
-                link = `/api/v1/announcements?page=${currentPage}&course=${course}&yearLevel=${yearLevel}&keyword=${title}`
-            } else if (yearLevel && title && track) {
-                link = `/api/v1/announcements?page=${currentPage}&yearLevel=${yearLevel}&track=${track}&keyword=${title}`
-            } else if (course && yearLevel) {
-                link = `/api/v1/announcements?page=${currentPage}&course=${course}&yearLevel=${yearLevel}`
-            } else if (course && title) {
-                link = `/api/v1/announcements?page=${currentPage}&course=${course}&keyword=${title}`
-            } else if (course && track) {
-                link = `/api/v1/announcements?page=${currentPage}&course=${course}&track=${track}`
-            } else if (yearLevel && title) {
-                link = `/api/v1/announcements?page=${currentPage}&yearLevel=${yearLevel}&keyword=${title}`
-            } else if (track && course) {
-                link = `/api/v1/announcements?page=${currentPage}&course=${course}&track=${track}`
-            } else if (track && title) {
-                link = `/api/v1/announcements?page=${currentPage}&track=${track}&keyword=${title}`
-            } else if (yearLevel && track) {
-                link = `/api/v1/announcements?page=${currentPage}&yearLevel=${yearLevel}&track=${track}`
-            } else if (course) {
-                link = `/api/v1/announcements?page=${currentPage}&course=${course}`
-            } else if (title) {
-                link = `/api/v1/announcements?page=${currentPage}&keyword=${title}`
-            } else if (track) {
-                link = `/api/v1/announcements?page=${currentPage}&track=${track}`
-            } else {
-                link = `/api/v1/announcements?page=${currentPage}&yearLevel=${yearLevel}`
-            }
-        }
+        let link = `/api/v1/announcements?page=${currentPage}${course ? `&course=${course}` : ``}${yearLevel ? `&yearLevel=${yearLevel}` : ``}${track ? `&track=${track}` : ``}${title ? `&keyword=${title}` : ``}${announcementType ? `&announcementType=${announcementType}` : ``}`
 
         const { data } = await axios.get(link)
 
@@ -208,7 +203,6 @@ export const getArchivedAnnouncements = () => async(dispatch) => {
         })
     }
     catch (error) {
-        console.log(error)
         dispatch({
             type: ALL_ARCHIVED_ANNOUNCEMENTS_FAIL,
             payload: error.response.data.errMessage
@@ -264,7 +258,7 @@ export const deleteAnnouncement = (id) => async(dispatch) => {
     catch(error){
         dispatch({
             type: DELETE_ANNOUNCEMENT_FAIL,
-            payload: error.response.data.message
+            payload: error.response.data.errMessage
             }
         )
     }
@@ -294,7 +288,7 @@ export const updateAnnouncement = (id, announcementData) => async(dispatch) => {
     catch(error){
         dispatch({
             type: UPDATE_ANNOUNCEMENT_FAIL,
-            payload: error.response.data.message
+            payload: error.response.data.errMessage
             }
         )
     }
@@ -324,7 +318,7 @@ export const archiveAnnouncement = (id) => async(dispatch) => {
     catch(error){
         dispatch({
             type: UPDATE_ANNOUNCEMENT_FAIL,
-            payload: error.response.data.message
+            payload: error.response.data.errMessage
             }
         )
     }

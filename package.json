@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node backend/server.js",
     "dev": "SET NODE_ENV=DEVELOPMENT& nodemon backend/server.js",
-    "prod": "SET NODE_ENV=PRODUCTION& nodemon backend/server.js",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false && npm install --prefix frontend && npm run build --prefix frontend"
+    "prod": "SET NODE_ENV=PRODUCTION& nodemon backend/server.js"
   },
   "author": "Miguel Ybera",
   "license": "ISC",
@@ -15,11 +14,12 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cloudinary": "^1.26.3",
+    "concurrently": "^6.2.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "http": "^0.0.1-security",
+    "http": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "jspdf": "^2.3.1",
     "mongoose": "^5.13.3",

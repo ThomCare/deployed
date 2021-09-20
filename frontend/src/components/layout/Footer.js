@@ -56,19 +56,18 @@ const Footer = () => {
                     </Col>
                     <Col xs={9}>
                         <p style={{ paddingTop: "20px", paddingBottom: "0px", paddingLeft: "0px", fontSize: "80%" }}>
-                            UST-College of Information and Computing Sciences <br />
-                            Blessed Pier Giorgio Frassati Building <br />
-
-                            Espana Blvd., Sampaloc, Manila, Philippines 1008 <br />
-                            +632-4061611 local 8241 or +632-7315738 for telefax
-
+                            University of Santo Tomas - College of Information and Computing Sciences <br />
+                            <i class="fa fa-map-marker" aria-hidden="true"></i> Blessed Pier Giorgio Frassati Building <br />
+                            <i class="fa fa-location-arrow" aria-hidden="true"></i> Espana Blvd., Sampaloc, Manila, Philippines 1008 <br />
+                            <i class="fa fa-phone" aria-hidden="true"></i> Local: +632-4061611 local 8241 <br />
+                            <i class="fa fa-fax" aria-hidden="true"></i> Telefax: +632-7315738
                         </p>
                     </Col>
                     <Col>
                     </Col>
                 </Row>
                 <Row>
-                    <p style={{ textAlign: "center", fontSize: "70%" }}>© COPYRIGHT 2021.ALL RIGHTS RESERVED.</p>
+                    <p style={{ textAlign: "center", fontSize: "70%" }}>© COPYRIGHT 2021. ALL RIGHTS RESERVED.</p>
                 </Row>
             </Style>
         </Fragment>

@@ -38,6 +38,8 @@ const Cards = styled.div`
     position: absolute;
     z-index: 1;`;
 
+const dropdown = { border: "2px solid black", borderRadius: "20px", margin: '5px 0' }
+
 const Announcements = () => {
 
     const alert = useAlert()
@@ -101,14 +103,15 @@ const Announcements = () => {
             dispatch(clearErrors())
         }
 
-        dispatch(getAnnouncements(currentPage, course, yearLevel, track, title))
+        dispatch(getAnnouncements(currentPage, course, yearLevel, track, title, annnouncementType))
 
         dispatch({
             type: INSIDE_DASHBOARD_FALSE
         })
-    }, [dispatch, alert, error, currentPage, course, yearLevel, track, title])
+    }, [dispatch, alert, error, currentPage, course, yearLevel, track, title, annnouncementType])
 
     const onChange = e => {
+        setCurrentPageNo(1)
         if (e.target.name === 'course') {
             let value = e.target.value
             setFilter({
@@ -163,8 +166,15 @@ const Announcements = () => {
                         <Col md="auto" style={{ paddingTop: "5px" }}><h7>Filters:</h7>
                         </Col>
                         <Col md="auto">
-                            <Form.Group controlId="selectCourseforAnnouncement" >
-                                <Form.Select aria-label="Course" size="sm" style={{ border: "2px solid black", borderRadius: "20px", margin: '5px 0' }} name="yearLevel" value={yearLevel} onChange={onChange}>
+                            <Form.Group>
+                                <Form.Select
+                                    aria-label="Course"
+                                    size="sm"
+                                    style={dropdown}
+                                    name="yearLevel"
+                                    value={yearLevel}
+                                    onChange={onChange}
+                                >
                                     <option value=''>Year Level</option>
                                     <option value="1st Year">1st Year</option>
                                     <option value="2nd Year">2nd Year</option>
@@ -174,9 +184,15 @@ const Announcements = () => {
                             </Form.Group>
                         </Col>
                         <Col md="auto">
-                            <Form.Group controlId="selectYearLevelforAnnouncement">
-
-                                <Form.Select aria-label="YearLevel" size="sm" style={{ border: "2px solid black", borderRadius: "20px", margin: '5px 0' }} name="course" value={course} onChange={onChange}>
+                            <Form.Group>
+                                <Form.Select
+                                    aria-label="YearLevel"
+                                    size="sm"
+                                    style={dropdown}
+                                    name="course"
+                                    value={course}
+                                    onChange={onChange}
+                                >
                                     <option value=''>Course</option>
                                     <option value="Computer Science">Computer Science</option>
                                     <option value="Information Systems">Information Systems</option>
@@ -185,9 +201,16 @@ const Announcements = () => {
                             </Form.Group>
                         </Col>
                         <Col md="auto">
-                            <Form.Group controlId="selectTrackforAnnouncement">
+                            <Form.Group>
 
-                                <Form.Select aria-label="ITTracks" size="sm" style={{ border: "2px solid black", borderRadius: "20px", margin: '5px 0' }} name="track" value={track} onChange={onChange}>
+                                <Form.Select
+                                    aria-label="tracks"
+                                    size="sm"
+                                    style={dropdown}
+                                    name="track"
+                                    value={track}
+                                    onChange={onChange}
+                                >
                                     <option value=''>Track</option>
                                     {String(course).includes('Information Systems') ? (
                                         <Fragment>
@@ -223,8 +246,15 @@ const Announcements = () => {
                             </Form.Group>
                         </Col>
                         <Col md="auto">
-                            <Form.Group controlId="selectAnnouncementTypeforAnnouncement">
-                                <Form.Select aria-label="AnnouncementType" size="sm" style={{ border: "2px solid black", borderRadius: "20px", margin: '5px 0'}} name="annnouncementType" value={annnouncementType} onChange={onChange}>
+                            <Form.Group>
+                                <Form.Select
+                                    aria-label="AnnouncementType"
+                                    size="sm"
+                                    style={dropdown}
+                                    name="annnouncementType"
+                                    value={annnouncementType}
+                                    onChange={onChange}
+                                >
                                     <option value=''>Announcement Type</option>
                                     <option value="Memorandum">Memorandum</option>
                                     <option value="Enrollment">Enrollment</option>
@@ -233,7 +263,7 @@ const Announcements = () => {
                             </Form.Group>
                         </Col>
                         <Col >
-                            <Form.Group controlId="searchAnnouncement" sm >
+                            <Form.Group sm >
                                 <FormControl
                                     type="search"
                                     placeholder="Search by title"
@@ -245,7 +275,7 @@ const Announcements = () => {
                                     onChange={onChange}
                                     width="170px"
                                     right="0px"
-                                    style={{ border: "2px solid black", borderRadius: "20px", margin: '5px 0' }}
+                                    style={dropdown}
                                 />
                             </Form.Group>
                         </Col>
@@ -270,7 +300,7 @@ const Announcements = () => {
                                         <br />
                                         <span style={{ fontSize: '12px' }}>Attachments: {announcement.fileAttachments.length} file(s)</span>
                                         <br />
-                                        <span style={{ fontWeight: '300', color: 'gray', fontSize: '12px' }}>Tags: {announcement.yearLevel}, {announcement.course}, {announcement.track}</span>
+                                        <span style={{ fontWeight: '300', color: 'gray', fontSize: '12px' }}>Tags: {announcement.yearLevel}, {announcement.course}, {announcement.track}, {announcement.annnouncementType}</span>
                                     </Card.Text>
                                 </Card.Body>
                             </Card>

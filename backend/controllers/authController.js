@@ -85,7 +85,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
     await user.save({ validateBeforeSave: false })
 
     // create reset password url
-    const link = `${req.protocol}://${req.get('host')}/password/reset/${resetToken}`
+    const link = `${req.protocol}://${process.env.THOM_HOST}/password/reset/${resetToken}`
 
     try {
         const message = await resetPassword({ link })
@@ -142,7 +142,6 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 
 // Register a student => /api/v1/registerStudent
 exports.registerStudent = catchAsyncErrors(async (req, res, next) => {
-
     const { firstName, middleName, lastName, studentNumber, course, email, password } = req.body;
 
     //for postman
@@ -164,7 +163,7 @@ exports.registerStudent = catchAsyncErrors(async (req, res, next) => {
     const registerToken = jwt.sign({ firstName, middleName, lastName, studentNumber, course, email, password }, process.env.ACCOUNT_TOKEN, { expiresIn: process.env.REGISTER_EXPIRES });
 
     // create reset password url
-    const link = `${req.protocol}://${req.get('host')}/verify/account/${registerToken}`
+    const link = `${req.protocol}://${process.env.THOM_HOST}/verify/account/${registerToken}`
 
     try {
         const message = await verifyEmail({ link })

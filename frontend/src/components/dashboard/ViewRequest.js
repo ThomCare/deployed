@@ -2,20 +2,25 @@ import React, { Fragment, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
-import { getRequestDetails, clearErrors } from './../../actions/requestActions'
+import { getRequestDetails, updateRequest, deleteRequest, assignRequest, clearErrors } from './../../actions/requestActions'
 import MetaData from './../layout/MetaData'
 import Loader from './../layout/Loader'
 import Sidebar from './../layout/Sidebar'
 import { MDBDataTableV5 } from 'mdbreact'
-import { Card, Button } from 'react-bootstrap'
+import { Card, Button, Modal, Row, Col } from 'react-bootstrap'
 import {
     INSIDE_DASHBOARD_TRUE
 } from '../../constants/dashboardConstants'
+import {
+    ASSIGN_REQUEST_RESET,
+    UPDATE_REQUEST_RESET,
+    DELETE_REQUEST_RESET
+} from '../../constants/requestConstants'
 
 var dateFormat = require('dateformat')
 
 const cardStyle = {
-    marginTop: '30px',
+    marginTop: '90px',
     marginBottom: '40px',
     borderWidth: '0'
 }
@@ -25,6 +30,7 @@ const ViewRequest = ({ history, match }) => {
     const alert = useAlert()
 
     const { loading, error, request } = useSelector(state => state.requestDetails)
+    const { error: updateError, isUpdated, isDeleted } = useSelector(state => state.request)
 
     function changeDateFormat(date) {
         return dateFormat(date, "mmm d, yyyy h:MMtt")
@@ -32,7 +38,7 @@ const ViewRequest = ({ history, match }) => {
 
     const requestId = match.params.id
     const id = requestId.substr(1, requestId.length - 1)
-    const viewType = requestId.substr(0, 1)
+    const [viewType, setViewType] = useState(requestId.substr(0, 1))
 
     const [requestorInfo, setRequestorInfo] = useState({})
     const [notes, setNotes] = useState('')
@@ -60,14 +66,89 @@ const ViewRequest = ({ history, match }) => {
         if (error) {
             window.history.back()
             alert.error(error)
+            dispatch(clearErrors())
         }
 
         dispatch({
             type: INSIDE_DASHBOARD_TRUE
         })
-    }, [dispatch, request, history, error])
+    }, [dispatch, request, history, error, isUpdated])
+
+    useEffect(() => {
+        if (error) {
+            alert.error(error)
+            dispatch(clearErrors())
+        }
+
+        if (updateError) {
+            alert.error(updateError)
+            dispatch(clearErrors())
+        }
+
+        if (isUpdated) {
+            if (viewType == 1) {
+                alert.success('Request has been moved to Trash.')
+                setViewType(4)
+                history.push(`/view/request/${viewType}${request._id}`)
+                dispatch({
+                    type: UPDATE_REQUEST_RESET
+                })
+            } else if (viewType == 4) {
+                alert.success('Request has been restored.')
+                setViewType(1)
+                history.push(`/view/request/${viewType}${request._id}`)
+                dispatch({
+                    type: UPDATE_REQUEST_RESET
+                })
+            } else if (viewType == 3) {
+                alert.success('Request has been assigned to user successfully.')
+                setViewType(1)
+                history.push(`/view/request/${viewType}${request._id}`)
+                dispatch({
+                    type: ASSIGN_REQUEST_RESET
+                })
+            }
+            dispatch(getRequestDetails(id))
+        }
+
+        if (isDeleted) {
+            if (viewType == 2) {
+                alert.success('Request has been deleted successfully.')
+                window.history.back()
+            } else if (viewType == 4) {
+                alert.success('Request has been deleted successfully.')
+                history.push('/admin/requests/trash')
+            }
+
+            dispatch({
+                type: DELETE_REQUEST_RESET
+            })
+        }
+
+        dispatch({
+            type: INSIDE_DASHBOARD_TRUE
+        })
+    }, [dispatch, history, alert, error, updateError, isUpdated, isDeleted])
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
     const upperCase = (text) => text.toUpperCase()
+
+    const updateRequestHandler = (id, del) => {
+        dispatch(updateRequest(id, { isTrash: del }, true))
+    }
+
+    const assignRequestHandler = (id) => {
+        dispatch(assignRequest(id, {}))
+    }
+
+    const deleteRequestHandler = (id) => {
+        dispatch(deleteRequest(id))
+        handleClose()
+    }
 
     const setHistory = () => {
         const data = {
@@ -122,12 +203,31 @@ const ViewRequest = ({ history, match }) => {
     return (
         <Fragment>
             <MetaData title={`Tracking ID: ${trackingNumber}`} />
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Are you sure you want to delete this request?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    This change cannot be undone.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={() => deleteRequestHandler(id)}>Yes, I'm sure</Button>
+                </Modal.Footer>
+            </Modal>
             <Sidebar />
             {!loading ? (
-                <Fragment style={{ marginTop: '30px' }}>
+                <Fragment>
                     <Card style={cardStyle}>
                         <Card.Body>
-                            <Card.Title>Tracking ID#: {trackingNumber}</Card.Title>
+                            <Card.Title><b>Tracking ID#: </b>{trackingNumber}</Card.Title>
                             <Card.Text><b>Name:</b> {requestorInfo.lastName}, {requestorInfo.firstName}</Card.Text>
                             <Card.Text><b>Current status:</b> <font color={
                                 !request ? '' : (
@@ -145,7 +245,7 @@ const ViewRequest = ({ history, match }) => {
                             <Card.Text><b>Year Level/Section:</b> {requestorInfo.yearLevel} {requestorInfo.section}</Card.Text>
                             <Card.Text><b>Notes:</b> {notes}</Card.Text>
                             <Card.Text>
-                                Attachments:
+                                <b>Attachments:</b>
                                 <ul>
                                     {fileRequirements && fileRequirements.map(file => (
                                         <li><a href={file.path}>{file.originalname}</a></li>
@@ -170,23 +270,75 @@ const ViewRequest = ({ history, match }) => {
                             sortable={false}
                             hover
                         />
-                        {viewType === '1' ? (
+                    </Card>
+                    <center>
+                        {viewType == 1 ? (
                             <Fragment>
-                                <Link to={`/admin/request/${id}`}><Button>Update</Button></Link>
-                                <Button>Delete</Button>
+                                <Link to={`/admin/request/${id}`}>
+                                    <Button
+                                        variant="primary"
+                                        style={{ width: '5rem', margin: '10px' }}
+                                    >
+                                        Update
+                                    </Button>
+                                </Link>
+                                <Button
+                                    variant="danger"
+                                    style={{ width: '5rem', margin: '10px' }} onClick={() => {
+                                        updateRequestHandler(id, true)
+                                    }}>
+                                    Delete
+                                </Button>
                             </Fragment>
-                        ) : ( 
-                            viewType === '3' ? (
-                                <Button>Assign to self</Button>
+                        ) : (
+                            viewType == 2 ? (
+                                <Fragment>
+                                    <Button
+                                        variant="danger"
+                                        style={{ width: '5rem', margin: '10px' }}
+                                        onClick={() => {
+                                            handleShow()
+                                        }}>
+                                        Delete
+                                    </Button>
+                                </Fragment>
                             ) : (
-                                viewType === '4' ? (
-                                    <Button>Delete</Button>
+                                viewType == 3 ? (
+                                    <Button
+                                        variant="warning"
+                                        style={{ width: '8rem', margin: '10px' }}
+                                        onClick={() => {
+                                            assignRequestHandler(id)
+                                        }}>
+                                        Assign to self
+                                    </Button>
                                 ) : (
-                                    <></>
+                                    viewType == 4 ? (
+                                        <Fragment>
+                                            <Button
+                                                variant="warning"
+                                                style={{ width: '5rem', margin: '10px' }}
+                                                onClick={() => {
+                                                    updateRequestHandler(id, false)
+                                                }}>
+                                                Restore
+                                            </Button>
+                                            <Button
+                                                variant="danger"
+                                                style={{ width: '5rem', margin: '10px' }}
+                                                onClick={() => {
+                                                    handleShow()
+                                                }}>
+                                                Delete
+                                            </Button>
+                                        </Fragment>
+                                    ) : (
+                                        <></>
+                                    )
                                 )
                             )
                         )}
-                    </Card>
+                    </center>
                 </Fragment>
             ) : (
                 <Loader />

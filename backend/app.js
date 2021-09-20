@@ -11,8 +11,6 @@ if(process.env.NODE_ENV !== 'PRODUCTION') require('dotenv').config({ path: 'back
 app.use(express.json());
 app.use(cookieParser());
 
-
-
 //Import all routes
 const announcements = require('./routes/announcement');
 const auth = require('./routes/auth');
@@ -43,7 +41,5 @@ if(process.env.NODE_ENV === 'PRODUCTION'){
 
 // Middleware to handle errors
 app.use(errorMiddleware);
-
-
 
 module.exports = app

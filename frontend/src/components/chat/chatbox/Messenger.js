@@ -79,7 +79,7 @@ const Messenger = ({ history }) => {
             catch (error) {
                 dispatch({
                     type: ALL_USERS_FAIL,
-                    payload: error.response.data.errMessage
+                    payload: error.response.data.message
                 })
             }
         }
@@ -137,7 +137,7 @@ const Messenger = ({ history }) => {
             catch (error) {
                 dispatch({
                     type: ALL_MESSAGES_FAIL,
-                    payload: error.response.data.errMessage
+                    payload: error.response.data.message
                 }
                 )
             }
@@ -177,28 +177,31 @@ const Messenger = ({ history }) => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const createConvo = (receiverId, receiverName) => {
+    const createConvo = (receiverId, firstMember, secondMember) => {
         const conversationDetails = {
             receiverId,
             senderId: userId,
-            receiverName
+            firstMember,
+            secondMember
         }
 
         dispatch(createConversation(conversationDetails))
         handleClose()
     }
 
+    const name = user && user.firstName + ' ' + user.lastName
     useEffect(() => {
         if (success) {
             history.push('/messenger')
             setCurrentChat(success)
-            setUserName(success.receiverName)
+            setUserName(success.names[0] === name ? success.names[1] : success.names[0])
 
             alert.success('Conversation created')
         }
 
         if (error) {
             alert.error(error)
+            dispatch(clearErrors())
         }
 
         dispatch({
@@ -206,15 +209,17 @@ const Messenger = ({ history }) => {
         })
     }, [dispatch, success, error, history])
 
+    const imglink = 'https://res.cloudinary.com/dwcxehcui/image/upload/v1632063359/logo/default_w0escb.png'
+
     const displayUsers = o => {
         if (o._id == userId) {
 
         } else {
             return (
                 <>
-                    <div className='chatOnlineFriend' onClick={() => createConvo(o._id, o.firstName + ' ' + o.lastName)}>
+                    <div className='chatOnlineFriend' onClick={() => createConvo(o._id, o.firstName + ' ' + o.lastName, user.firstName + ' ' + user.lastName)}>
                         <div className='chatOnlineImgContainer'>
-                            <img className='chatOnlineImg' src='https://res.cloudinary.com/exstrial/image/upload/v1627805763/ShopIT/sanake_ibs7sb.jpg' alt='' />
+                            <img className='chatOnlineImg' src={imglink} alt='' />
                         </div>
                         <span className='chatOnlineName'>{o?.firstName} {o?.lastName}</span>
                     </div>
@@ -263,8 +268,9 @@ const Messenger = ({ history }) => {
                         {conversations.map((c) => (
                             <Fragment>
                                 <div onClick={() => {
+                                    console.log(c)
                                     setCurrentChat(c)
-                                    setUserName(c.receiverName)
+                                    setUserName(c.names[0] === name ? c.names[1] : c.names[0])
                                 }}>
                                     <Conversation conversation={c} currentUser={user} />
                                 </div>

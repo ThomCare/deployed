@@ -3,6 +3,9 @@ import {
     REQUEST_DETAILS_REQUEST,
     REQUEST_DETAILS_SUCCESS,
     REQUEST_DETAILS_FAIL,
+    TRACK_REQUEST_REQUEST,
+    TRACK_REQUEST_SUCCESS,
+    TRACK_REQUEST_FAIL,
     SAVE_FORM_SUCCESS,
     SUBMIT_REQUEST_REQUEST,
     SUBMIT_REQUEST_SUCCESS,
@@ -29,7 +32,7 @@ import {
 export const trackRequest = (userInput) => async (dispatch) => {
     try {
         dispatch({
-            type: REQUEST_DETAILS_REQUEST
+            type: TRACK_REQUEST_REQUEST
         })
 
         const config = {
@@ -41,13 +44,13 @@ export const trackRequest = (userInput) => async (dispatch) => {
         const { data } = await axios.post(`/api/v1/tracker`, userInput, config)
 
         dispatch({
-            type: REQUEST_DETAILS_SUCCESS,
+            type: TRACK_REQUEST_SUCCESS,
             payload: data
         })
     }
     catch (error) {
         dispatch({
-            type: REQUEST_DETAILS_FAIL,
+            type: TRACK_REQUEST_FAIL,
             payload: error.response.data.errMessage
         }
         )
@@ -102,18 +105,7 @@ export const getRequests = (role, route) => async (dispatch) => {
 
         let link = ``
 
-        if (role === 'Dept Chair') {
-            switch (route) {
-                case 'Trash':
-                    link = `/api/v1/admin/requests/trash`
-                    break
-                case 'Requests':
-                    link = `/api/v1/admin/deptChair/requests`
-                    break
-                default:
-                    link = ``
-            }
-        } else if (role === 'CICS Staff') {
+        if (role === 'CICS Staff') {
             switch (route) {
                 case 'Office':
                     link = `/api/v1/admin/cics/office/requests`
@@ -136,7 +128,16 @@ export const getRequests = (role, route) => async (dispatch) => {
         } else if (role === 'Student') { //student
             link = `/api/v1/me/requests`
         } else {
-            link = ``
+            switch (route) {
+                case 'Trash':
+                    link = `/api/v1/admin/requests/trash`
+                    break
+                case 'Requests':
+                    link = `/api/v1/admin/deptChair/requests`
+                    break
+                default:
+                    link = ``
+            }
         }
 
         const { data } = await axios.get(link)
@@ -187,14 +188,12 @@ export const getRecent = (role) => async (dispatch) => {
 
         let link = ``
 
-        if (role === 'Dept Chair') {
-            link = `/api/v1/admin/deptChair/requests`
-        } else if (role === 'CICS Staff') {
+        if (role === 'CICS Staff') {
             link = `/api/v1/admin/cics/all/requests`
         } else if (role === 'Student') { //student
             link = `/api/v1/me/requests`
         } else {
-            link = ``
+            link = `/api/v1/admin/deptChair/requests`
         }
 
         const { data } = await axios.get(link)
@@ -206,7 +205,7 @@ export const getRecent = (role) => async (dispatch) => {
     }
     catch (error) {
         dispatch({
-            type: GET_REQUESTS_FAIL,
+            type: GET_RECENT_FAIL,
             payload: error.response.data.errMessage
         }
         )
@@ -303,7 +302,7 @@ export const deleteRequest = (requestId) => async (dispatch) => {
     catch (error) {
         dispatch({
             type: DELETE_REQUEST_FAIL,
-            payload: error.response.data.message
+            payload: error.response.data.errMessage
         }
         )
     }

@@ -227,7 +227,7 @@ export const updatePassword = ( passwords ) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: UPDATE_PASSWORD_FAIL,
-            payload: error.response.data.message
+            payload: error.response.data.errMessage
         })
     }
 }
@@ -245,7 +245,6 @@ export const updateProfile = (userData) => async (dispatch) => {
             }
         }
 
-        console.log(userData)
         const { data } = await axios.put(`/api/v1/admin/me/update`, userData, config)
         
         dispatch({
@@ -337,7 +336,7 @@ export const deleteUser = (id) => async(dispatch) => {
     catch(error){
         dispatch({
             type: DELETE_USER_FAIL,
-            payload: error.response.data.message
+            payload: error.response.data.errMessage
             }
         )
     }
@@ -366,7 +365,7 @@ export const updateUser = (id, userData) => async(dispatch) => {
     catch(error){
         dispatch({
             type: UPDATE_USER_FAIL,
-            payload: error.response.data.message
+            payload: error.response.data.errMessage
             }
         )
     }

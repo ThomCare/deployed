@@ -1,13 +1,14 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import { useAlert } from 'react-alert'
-import { useDispatch, useSelector } from 'react-redux'
-import { trackRequest, clearErrors } from './../../actions/requestActions'
-import { REQUEST_DETAILS_RESET } from './../../constants/requestConstants'
+import { useDispatch } from 'react-redux'
 import MetaData from './../layout/MetaData'
 import { Card, Container, Row, FloatingLabel, Form, Button } from 'react-bootstrap'
 import {
     INSIDE_DASHBOARD_FALSE
 } from '../../constants/dashboardConstants'
+import {
+    TRACK_REQUEST_RESET
+} from '../../constants/requestConstants'
 
 const TrackingPage = ({ history }) => {
     const alert = useAlert()
@@ -21,6 +22,9 @@ const TrackingPage = ({ history }) => {
     const { trackingNumber, lastName } = userInfo
 
     const submitHandler = e => {
+        dispatch({
+            type: TRACK_REQUEST_RESET
+        })
         history.push(`/track/${userInfo.trackingNumber}/${userInfo.lastName}`)
     }
 
@@ -45,32 +49,45 @@ const TrackingPage = ({ history }) => {
     return (
         <Fragment>
             <MetaData title={'Track my request'} />
-            
             <Container fluid >
                 <Row className='justify-content-md-center' style={{ marginTop: '50px' }}>
-                    <Card style={{ backgroundColor: "#F5F5F5",width: '30rem', align: 'center',borderTop: '7px solid #9c0b0b', marginBottom: '50px'}}>
+                    <Card style={{ backgroundColor: "#F5F5F5", width: '30rem', align: 'center', borderTop: '7px solid #9c0b0b', marginBottom: '50px' }}>
                         <Card.Body>
-                            <Card.Title style={{ margin: '20px 0 20px 0', fontWeight:"bold" }}>Track my Request</Card.Title>
-                            <FloatingLabel
-                                controlId="floatingInput"
-                                label="Tracking ID"
-                                className="mb-3"
-                            >
-                                <Form.Control type="text" placeholder="ABC123" name="trackingNumber" value={trackingNumber} onChange={onChange} />
-                            </FloatingLabel>
-
-                            <FloatingLabel controlId="floatingInput" label="Surname">
-                                <Form.Control type="text" placeholder="Surname" name="lastName" value={lastName} onChange={onChange} />
-                            </FloatingLabel>
-                            <center>
-                                <Button
-                                    onClick={submitHandler}
-                                    type='submit'
-                                    style={{ marginTop: '10px', borderRadius: '50px', width: '10rem' }}
+                            <Card.Title style={{ margin: '20px 0 20px 0', fontWeight: "bold" }}>Track my Request</Card.Title>
+                            <Form onSubmit={submitHandler}>
+                                <FloatingLabel
+                                    label="Tracking ID"
+                                    className="mb-3"
                                 >
-                                    Track
-                                </Button>
-                            </center>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="ABC123"
+                                        name="trackingNumber"
+                                        value={trackingNumber}
+                                        onChange={onChange}
+                                        required
+                                    />
+                                </FloatingLabel>
+
+                                <FloatingLabel label="Surname">
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Surname"
+                                        name="lastName"
+                                        value={lastName}
+                                        onChange={onChange}
+                                        required
+                                    />
+                                </FloatingLabel>
+                                <center>
+                                    <Button
+                                        type='submit'
+                                        style={{ marginTop: '10px', borderRadius: '50px', width: '10rem' }}
+                                    >
+                                        Track
+                                    </Button>
+                                </center>
+                            </Form>
                         </Card.Body>
                     </Card>
                 </Row>

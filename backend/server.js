@@ -1,19 +1,19 @@
 const app = require('./app');
-//const dotenv = require('dotenv');
+const dotenv = require('dotenv');
 const connectDatabase = require('./config/database');
 const cloudinary = require('cloudinary').v2;
 const { connect } = require('mongoose');
 
 // Handle Uncaught exceptions
 process.on('uncaughtException', err => {
-    console.log(`ERRORL: ${err.message}`);
+    console.log(`ERROR: ${err.message}`);
     console.log('Shutting down server due to uncaught exceptions');
     process.exit(1)
 })
 
 // Setting up config file
-if(process.env.NODE_ENV !== 'PRODUCTION') require('dotenv').config({ path: 'backend/config/config.env' })
-
+dotenv.config({ path: 'backend/config/config.env' })
+//if(process.env.NODE_ENV !== 'PRODUCTION') require('dotenv').config({ path: 'backend/config/config.env' })
 
 // Connecting to Database
 connectDatabase();
@@ -28,16 +28,12 @@ cloudinary.config({
 const server = app.listen(process.env.PORT, () => {
     console.log(`Server started on PORT: ${process.env.PORT} in ${process.env.NODE_ENV} mode.`);
 })
+
 //socket
-
-
 const socketio = require('socket.io')
 
 var cors = require('cors')
 app.use(cors())
-
-
-
 
 const io = socketio(server, {
     cors: {

@@ -3,6 +3,10 @@ import {
     REQUEST_DETAILS_SUCCESS,
     REQUEST_DETAILS_FAIL,
     REQUEST_DETAILS_RESET,
+    TRACK_REQUEST_REQUEST,
+    TRACK_REQUEST_SUCCESS,
+    TRACK_REQUEST_FAIL,
+    TRACK_REQUEST_RESET,
     SAVE_FORM_SUCCESS,
     SUBMIT_REQUEST_REQUEST,
     SUBMIT_REQUEST_SUCCESS,
@@ -29,43 +33,35 @@ import {
     CLEAR_ERRORS
 } from '../constants/requestConstants'
 
-
-//get single request details
-export const getRequestDetailsReducer = (state = { request: {} }, action) => {
+//track request reducer
+export const trackRequestReducer = (state = { request: {} }, action) => {
     switch (action.type) {
-        case REQUEST_DETAILS_REQUEST:
-        case SUBMIT_REQUEST_REQUEST:
+        case TRACK_REQUEST_REQUEST:
             return {
                 ...state,
                 loading: true
             }
 
-        case REQUEST_DETAILS_SUCCESS:
-        case SUBMIT_REQUEST_SUCCESS:
+        case TRACK_REQUEST_SUCCESS:
             return {
                 loading: false,
                 request: action.payload.request,
                 success: action.payload.success
             }
 
-        case REQUEST_DETAILS_FAIL:
-        case SUBMIT_REQUEST_FAIL:
+        case TRACK_REQUEST_FAIL:
             return {
                 ...state,
+                loading: false,
                 error: action.payload
             }
 
-        case REQUEST_DETAILS_RESET:
+        case TRACK_REQUEST_RESET:
             return {
                 ...state,
                 success: null,
+                error: null,
                 request: {}
-            }
-
-        case SUBMIT_REQUEST_RESET:
-            return {
-                ...state,
-                success: null
             }
 
         case CLEAR_ERRORS:
@@ -80,12 +76,79 @@ export const getRequestDetailsReducer = (state = { request: {} }, action) => {
     }
 }
 
+//get single request details
+export const getRequestDetailsReducer = (state = { request: {} }, action) => {
+    switch (action.type) {
+        case REQUEST_DETAILS_REQUEST:
+            return {
+                loading: true
+            }
+
+
+        case REQUEST_DETAILS_SUCCESS:
+            return {
+                loading: false,
+                request: action.payload.request,
+                success: action.payload.success
+            }
+
+        case REQUEST_DETAILS_FAIL:
+            return {
+                loading: false,
+                error: action.payload
+            }
+
+        case REQUEST_DETAILS_RESET:
+            return {
+                ...state,
+                success: null,
+                request: {}
+            }
+
+        case CLEAR_ERRORS:
+            return {
+                ...state,
+                error: null
+            }
+
+        default:
+            return state
+    }
+}
+
 //save form details
-export const saveFormDetailsReducer = (state = { formData: {} }, action) => {
+export const saveFormDetailsReducer = (state = { formData: {}, request: {} }, action) => {
     switch (action.type) {
         case SAVE_FORM_SUCCESS:
             return {
                 formData: action.payload
+            }
+
+        case SUBMIT_REQUEST_REQUEST:
+            return {
+                ...state,
+                loading: true
+            }
+
+        case SUBMIT_REQUEST_SUCCESS:
+            return {
+                loading: false,
+                request: action.payload.request,
+                success: action.payload.success
+            }
+
+        case SUBMIT_REQUEST_FAIL:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload
+            }
+
+        case SUBMIT_REQUEST_RESET:
+            return {
+                ...state,
+                success: null,
+                request: {}
             }
 
         case CLEAR_ERRORS:
@@ -163,7 +226,7 @@ export const getRecentReducer = (state = { recents: [] }, action) => {
                 loading: false,
                 recents: action.payload
             }
-            
+
         case GET_RECENT_FAIL:
             return {
                 ...state,
