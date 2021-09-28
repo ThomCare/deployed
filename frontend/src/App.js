@@ -22,7 +22,6 @@ import AnnouncementDetails from './components/home/announcement/AnnouncementDeta
 //home/auth folder
 import Login from './components/home/auth/Login'
 import Register from './components/home/auth/Register'
-import ConfirmRegister from './components/home/auth/ConfirmRegister'
 import ForgotPassword from './components/home/auth/ForgotPassword'
 import NewPassword from './components/home/auth/NewPassword'
 import UpdatePassword from './components/home/auth/UpdatePassword'
@@ -102,7 +101,7 @@ function App() {
         <Router>
             <div className="App">
                 <ScrollToTop>
-                    {!loading && !dashboard && (
+                    {!dashboard && (
                         <Header/>
                     )}
                     <Fragment>
@@ -111,7 +110,7 @@ function App() {
                                 {/**ANNOUNCEMENT ROUTES */}
                                     <Route path='/' component={Announcements} exact />
                                     <Route path='/announcement/:id' component={AnnouncementDetails} exact />
-
+                        {/**TRACK REQUEST ROUTES */}
                                     <Route path='/track' component={TrackingPage} exact />
                                     <Route path='/track/:trackingNumber/:lastName' component={TrackingPageProgress} exact />
 
@@ -200,7 +199,7 @@ function App() {
                             {/**CONTROL PANEL ROUTES */}
                         </div>
                     </Fragment>
-                    {!loading && !dashboard && (
+                    { !dashboard && (
                         <Footer/>
                     )}
                 </ScrollToTop>
