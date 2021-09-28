@@ -32,21 +32,22 @@ export const createConversationReducer = (state = {}, action) => {
             return {
                 ...state,
                 loading: false,
-                success: action.payload
+                conversation: action.payload.conversation,
+                message: action.payload.message
             }
 
         case CREATE_CONVERSATION_FAIL:
             return {
                 ...state,
                 loading: false,
-                error: action.payload,
-                success: false
+                error: action.payload
             }
 
         case CREATE_CONVERSATION_RESET:
             return {
                 ...state,
-                success: false
+                conversation: {},
+                message: null
             }
 
         case CLEAR_ERRORS:
@@ -72,6 +73,7 @@ export const conversationReducer = (state = { conversations: [] }, action) => {
         case ALL_CONVERSATIONS_SUCCESS:
             return {
                 loading: false,
+                success: action.payload.success,
                 conversations: action.payload.conversations
             }
 
@@ -79,6 +81,7 @@ export const conversationReducer = (state = { conversations: [] }, action) => {
             return {
                 ...state,
                 loading: false,
+                success: null,
                 error: action.payload
             }
 

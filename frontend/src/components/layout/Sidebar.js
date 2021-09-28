@@ -1,14 +1,12 @@
-import React, { Fragment, useState, useEffect } from 'react'
-import styled from 'styled-components'
-import { useAlert } from 'react-alert'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import * as FaIcons from 'react-icons/fa'
 import * as AiIcons from 'react-icons/ai'
-import { SidebarData } from './SidebarData'
-import SubMenu from './SubMenu'
 import { IconContext } from 'react-icons/lib'
-import { Container, Row } from 'react-bootstrap'
+import styled from 'styled-components'
+import SubMenu from './SubMenu'
+import { SidebarData } from './SidebarData'
 
 const Nav = styled.div`
     background: #9C0B0A;
@@ -24,8 +22,7 @@ const Nav = styled.div`
     position: absolute;
     top: 0px;
     z-index:10;
-    border-bottom: 7px #750908 solid;
-`;
+    border-bottom: 7px #750908 solid;`;
 
 const NavIcon = styled(Link)`
     margin-left: 1rem;
@@ -76,20 +73,16 @@ const SidebarNav = styled.nav`
     z-index:1000;
     overflow-y: auto;`;
 
-const SidebarText = styled.div`
-    font-size: 20px;`;
-
 const SidebarWrap = styled.div`
     width: 100%;`;
 
 const Sidebar = () => {
-
     const { user } = useSelector(state => state.auth)
 
     const [sidebar, setSidebar] = useState(false);
 
     const showSidebar = () => setSidebar(!sidebar);
-    
+
     return (
         <>
             <IconContext.Provider value={{ color: '#red' }}>
@@ -104,11 +97,9 @@ const Sidebar = () => {
                             width="26"
                             height="29"
                             paddingRight="0px"
-
                             alt="CICS Seal" />
 
                         <p style={{
-
                             color: "white",
                             fontFamily: "AveriaBold",
                             paddingTop: "17px",
@@ -119,12 +110,10 @@ const Sidebar = () => {
                             paddingLeft: "6px",
                         }}>ThomCare Control Panel</p>
                     </NavTitle>
-                    <NavUser >
-
-                        <p >{`${user.role}`} : </p>
+                    <NavUser>
+                        <p > {user.role}:</p>
                         <p style={{ color: "#9C0B0A" }}>_ </p>
                         <p > {user.firstName}</p>
-
                     </NavUser>
                 </Nav>
                 <SidebarNav sidebar={sidebar} >
@@ -132,30 +121,27 @@ const Sidebar = () => {
                         <NavIcon to="#">
                             <AiIcons.AiOutlineClose onClick={showSidebar} />
                         </NavIcon>
-                        {
-                            user.role === 'Student' ? (
+                        {user.role === 'Student' ? (
+                            <Fragment>
+                                {SidebarData[0].map((item, index) => {
+                                    return <SubMenu item={item} key={index} />;
+                                })}
+                            </Fragment>
+                        ) : (
+                            user.role === 'CICS Staff' ? (
                                 <Fragment>
-                                    {SidebarData[0].map((item, index) => {
+                                    {SidebarData[2].map((item, index) => {
                                         return <SubMenu item={item} key={index} />;
                                     })}
                                 </Fragment>
                             ) : (
-                                user.role === 'CICS Staff' ? (
-                                    <Fragment>
-                                        {SidebarData[2].map((item, index) => {
-                                            return <SubMenu item={item} key={index} />;
-                                        })}
-                                    </Fragment>
-                                ) : (
-                                    <Fragment>
-                                        {SidebarData[1].map((item, index) => {
-                                            return <SubMenu item={item} key={index} />;
-                                        })}
-                                    </Fragment>
-                                )
+                                <Fragment>
+                                    {SidebarData[1].map((item, index) => {
+                                        return <SubMenu item={item} key={index} />;
+                                    })}
+                                </Fragment>
                             )
-                        }
-
+                        )}
                     </SidebarWrap>
                 </SidebarNav>
             </IconContext.Provider>

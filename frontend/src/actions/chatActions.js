@@ -13,14 +13,13 @@ import {
 } from '../constants/chatConstants'
 
 //get all conversations
-export const getConversations = (id) => async(dispatch) => {
-
+export const getConversations = (id, name) => async (dispatch) => {
     try {
         dispatch({
             type: ALL_CONVERSATIONS_REQUEST
         })
 
-        const { data } = await axios.get(`/api/v1/convo/${id}`)
+        const { data } = await axios.get(`/api/v1/convo/${id}?${name ? `keyword=${name}` : ``}`)
 
         dispatch({
             type: ALL_CONVERSATIONS_SUCCESS,
@@ -30,14 +29,13 @@ export const getConversations = (id) => async(dispatch) => {
     catch (error) {
         dispatch({
             type: ALL_CONVERSATIONS_FAIL,
-            payload: error.response.data.errMessage
-            }
-        )
+            payload: error.response.data.message
+        })
     }
 }
 
 //send message
-export const sendMessage = ( message ) => async (dispatch, getState) => {
+export const sendMessage = (message) => async (dispatch, getState) => {
     try {
         dispatch({
             type: SEND_MESSAGE_REQUEST
@@ -59,13 +57,13 @@ export const sendMessage = ( message ) => async (dispatch, getState) => {
     catch (error) {
         dispatch({
             type: SEND_MESSAGE_FAIL,
-            payload: error.response.data.errMessage
+            payload: error.response.data.message
         })
     }
 }
 
 //create new conversation
-export const createConversation = (convo) => async(dispatch) => {
+export const createConversation = (convo) => async (dispatch) => {
 
     try {
         dispatch({
@@ -88,14 +86,13 @@ export const createConversation = (convo) => async(dispatch) => {
     catch (error) {
         dispatch({
             type: CREATE_CONVERSATION_FAIL,
-            payload: error.response.data.errMessage
-            }
-        )
+            payload: error.response.data.message
+        })
     }
 }
 
 //clear errors
-export const clearErrors = () => async(dispatch) => {
+export const clearErrors = () => async (dispatch) => {
     dispatch({
         type: CLEAR_ERRORS
     })

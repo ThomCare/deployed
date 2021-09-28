@@ -8,7 +8,6 @@ import {
     userDetailsReducer,
     registerReducer,
     forgotPasswordReducer,
-    studentInfoReducer,
     userReducer
 } from './reducers/userReducers'
 
@@ -21,8 +20,10 @@ import {
 
 import {
     getAnnouncementsReducer,
+    getAnnouncementTypeReducer,
     getAnnouncementDetailsReducer,
     newAnnouncementReducer,
+    newAnnouncementTypeReducer,
     announcementReducer
 } from './reducers/announcementReducers'
 
@@ -31,12 +32,15 @@ import {
     getRequestDetailsReducer,
     getRequestsReducer,
     getRecentReducer,
-    saveFormDetailsReducer,
+    submitRequestReducer,
     requestReducer
 } from './reducers/requestReducer'
 
 import {
-    getCoursesReducer
+    newCourseReducer,
+    getCoursesReducer,
+    getCourseDetailsReducer,
+    courseReducer
 } from './reducers/courseReducers'
 
 import {
@@ -46,6 +50,14 @@ import {
 import {
     auditLogsReducer
 } from './reducers/auditReducers'
+
+import {
+    createFormReducer,
+    formsReducer,
+    formDetailsReducer,
+    formReducer
+} from './reducers/formReducers'
+
 
 const reducer = combineReducers({
     auth: authReducer, //get currently logged in, for login and logout
@@ -62,34 +74,34 @@ const reducer = combineReducers({
     forgotPassword: forgotPasswordReducer, //for forgot password and set new password
 
     announcements: getAnnouncementsReducer, //get all announcements
+    announcementType: getAnnouncementTypeReducer, //get announcement type list
     announcementDetails: getAnnouncementDetailsReducer, //get single announcement details
     newAnnouncement: newAnnouncementReducer, //create new announcement
+    newAnnouncementType: newAnnouncementTypeReducer, //create new announcement type
     announcement: announcementReducer, //update or delete announcement
 
-    student: studentInfoReducer, //save trackingNumber and surname ? or request details in local storage
     track: trackRequestReducer,
     requestDetails: getRequestDetailsReducer, //get single request details
     requests: getRequestsReducer, //get all requests
     recents: getRecentReducer,
-    form: saveFormDetailsReducer,
+    submitRequest: submitRequestReducer,
     request: requestReducer,
 
-    courses: getCoursesReducer, //get single request details
+    courses: getCoursesReducer, //get all courses details
+    course: courseReducer, // update delete course
+    courseDetails: getCourseDetailsReducer, // get course details
+    newCourse: newCourseReducer, // update delete course
     audits: auditLogsReducer, //get all audits
+
+    form: formReducer, // update delete form
+    forms: formsReducer, // get all forms
+    formDetails: formDetailsReducer, // get single form
+    newForm: createFormReducer, // create new form
 
     dashboard: dashboardReducer //check if inside dashboard,
 })
 
-
-
-let initialState = {
-    student: {
-        studentInfo: localStorage.getItem('studentInfo') ? JSON.parse(localStorage.getItem('studentInfo')) : {}
-    },
-    request: {
-        request: localStorage.getItem('trackData') ? JSON.parse(localStorage.getItem('trackData')) : {}
-    }
-} //contains all the data we want to put in this state just before loading the application
+let initialState = {} //contains all the data we want to put in this state just before loading the application
 
 //clear the store
 const middleware = [thunk]

@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const path = require('path')
 const multer = require('multer')
+const ErrorHandler = require('../utils/errorHandler');
 const fileMimeTypes = [
     'image/jpeg',
     'image/png',

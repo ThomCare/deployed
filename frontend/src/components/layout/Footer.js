@@ -1,44 +1,19 @@
 import React, { Fragment } from 'react'
 import { Row, Col } from 'react-bootstrap'
-import '../../App.css'
 import styled from 'styled-components'
-
-const Cards = styled.div`
-    background-color: yellow;
-    
-    
-  text-align: center;
-  color: white;
-  
-  clear: both;
-    position: relative;
-    height: 200px;
-    margin-top: -200px;
-  bottom: 0px;
-  margin: 0px;
-  padding: 0px;
-  
-  z-index: 1;
-  
-`;
+import '../../App.css'
 
 const Style = styled.div`
-z-index: 1;
-margin-top: auto;
-width: 100%;
-background-color: #9c0b0b;
-color: white;
-bottom: 0;
-right: 0;
-left:0;
-position: relative;
-`;
+    z-index: 1;
+    margin-top: auto;
+    width: 100%;
+    background-color: #9c0b0b;
+    color: white;
+    bottom: 0;
+    right: 0;
+    left:0;
+    position: relative;`;
 
-const Left = styled.div`
-    position: relative;
-    margin-left: 10px
-    paddingto
-`;
 const Footer = () => {
     return (
         <Fragment>

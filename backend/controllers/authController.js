@@ -57,6 +57,7 @@ exports.login = catchAsyncErrors(async (req, res, next) => {
 
     if (!isPasswordMatched) { return next(new ErrorHandler('Invalid Email or Password', 401)); }
 
+    console.log(`Log in from ${user.firstName}`)
     sendToken(user, 200, res)
 })
 
@@ -67,9 +68,23 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
         httpOnly: true
     })
 
+    // res.setHeader(
+    //     "Set-Cookie",
+    //     cookie.serialize("token", "", {
+    //       httpOnly: true,
+    //       secure: process.env.NODE_ENV !== "development",
+    //       expires: new Date(0),
+    //       sameSite: "strict",
+    //       path: "/",
+    //     })
+    //   );
+
+    // res.clearCookie('token')
+    console.log('User logged out.')
+
     res.status(200).json({
         success: true,
-        message: "Logged out"
+        message: 'Logged out'
     })
 })
 
@@ -85,7 +100,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
     await user.save({ validateBeforeSave: false })
 
     // create reset password url
-    const link = `${req.protocol}://${req.get('host')}/password/reset/${resetToken}`
+    const link = `${req.protocol}://${process.env.THOM_HOST}/password/reset/${resetToken}`
 
     try {
         const message = await resetPassword({ link })
@@ -163,7 +178,7 @@ exports.registerStudent = catchAsyncErrors(async (req, res, next) => {
     const registerToken = jwt.sign({ firstName, middleName, lastName, studentNumber, course, email, password }, process.env.ACCOUNT_TOKEN, { expiresIn: process.env.REGISTER_EXPIRES });
 
     // create reset password url
-    const link = `${req.protocol}://${req.get('host')}/verify/account/${registerToken}`
+    const link = `${req.protocol}://${process.env.THOM_HOST}/verify/account/${registerToken}`
 
     try {
         const message = await verifyEmail({ link })
@@ -218,6 +233,8 @@ exports.verifyStudent = catchAsyncErrors(async (req, res, next) => {
 // Get currently logged in user details => /api/v1/me
 exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findById(req.user.id)
+
+    console.log('Current user:', user.firstName)
 
     res.status(200).json({
         success: true,
@@ -335,12 +352,12 @@ exports.getStudentAccounts = catchAsyncErrors(async (req, res, next) => {
 // Get all admin accounts=> /api/v1/chat/adminUsers
 exports.getChatAccounts = catchAsyncErrors(async (req, res, next) => {
     let users
-    if(req.user.role == 'Student'){
+    if (req.user.role == 'Student') {
         users = await User.find({ role: { $ne: 'Student' } })
-    }else{
-         users = await User.find()
+    } else {
+        users = await User.find()
     }
-     
+
 
     res.status(200).json({
         success: true,

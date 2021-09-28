@@ -18,6 +18,9 @@ import {
     ALL_USERS_REQUEST,
     ALL_USERS_SUCCESS,
     ALL_USERS_FAIL,
+    ALL_STUDENTS_REQUEST,
+    ALL_STUDENTS_SUCCESS,
+    ALL_STUDENTS_FAIL,
     USER_DETAILS_REQUEST,
     USER_DETAILS_SUCCESS,
     USER_DETAILS_FAIL,
@@ -29,8 +32,6 @@ import {
     DELETE_USER_SUCCESS,
     DELETE_USER_FAIL,
     DELETE_USER_RESET,
-    SAVE_STUDENT_INFO,
-    RESET_STUDENT_INFO,
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
     REGISTER_USER_FAIL,
@@ -115,8 +116,7 @@ export const authReducer = (state = { user: {} }, action) => {
                 ...state,
                 loading: false,
                 isAuthenticated: true,
-                user: action.payload,
-                success: action.payload
+                user: action.payload
             }
 
         case LOGOUT_SUCCESS:
@@ -131,13 +131,7 @@ export const authReducer = (state = { user: {} }, action) => {
                 loading: false,
                 isAuthenticated: false,
                 user: null,
-                loadError: action.payload //changed 
-            }
-
-        case LOGOUT_FAIL:
-            return {
-                ...state,
-                error: action.payload
+                loadError: action.payload
             }
 
         case LOGIN_FAIL:
@@ -146,6 +140,12 @@ export const authReducer = (state = { user: {} }, action) => {
                 loading: false,
                 isAuthenticated: false,
                 user: null,
+                error: action.payload
+            }
+
+        case LOGOUT_FAIL:
+            return {
+                ...state,
                 error: action.payload
             }
 
@@ -164,18 +164,21 @@ export const authReducer = (state = { user: {} }, action) => {
 export const getUsersReducer = (state = { users: [] }, action) => {
     switch (action.type) {
         case ALL_USERS_REQUEST:
+        case ALL_STUDENTS_REQUEST:
             return {
                 loading: true,
                 users: []
             }
 
         case ALL_USERS_SUCCESS:
+        case ALL_STUDENTS_SUCCESS:
             return {
                 loading: false,
                 users: action.payload.users
             }
 
         case ALL_USERS_FAIL:
+        case ALL_STUDENTS_FAIL:
             return {
                 loading: false,
                 error: action.payload
@@ -259,8 +262,7 @@ export const registerReducer = (state = {}, action) => {
         case VERIFY_STUDENT_RESET:
             return {
                 ...state,
-                isCreated: false,
-                studentInfo: {}
+                isCreated: false
             }
 
         case CLEAR_ERRORS:
@@ -341,34 +343,6 @@ export const userReducer = (state = {}, action) => {
     }
 }
 
-//save student info to local storage
-export const studentInfoReducer = (state = { studentInfo: {} }, action) => {
-    switch (action.type) {
-        case SAVE_STUDENT_INFO: {
-            return {
-                ...state,
-                studentInfo: action.payload
-            }
-        }
-
-        case RESET_STUDENT_INFO: {
-            return {
-                ...state,
-                studentInfo: null
-            }
-        }
-
-        case CLEAR_ERRORS:
-            return {
-                ...state,
-                error: null
-            }
-
-        default:
-            return state
-    }
-}
-
 //forgot password and set new password
 export const forgotPasswordReducer = (state = {}, action) => {
     switch (action.type) {
@@ -406,7 +380,7 @@ export const forgotPasswordReducer = (state = {}, action) => {
             return {
                 loading: false
             }
-            
+
         case NEW_PASSWORD_RESET:
             return {
                 ...state,

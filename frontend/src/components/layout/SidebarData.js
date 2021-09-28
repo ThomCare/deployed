@@ -79,13 +79,13 @@ export const SidebarData = [
                     title: 'Archived Announcements',
                     path: '/admin/archives/announcements',
                     icon: <i class="fa fa-archive" aria-hidden="true"></i>
+                },
+                {
+                    title: 'Announcement Types',
+                    path: '/admin/announcementTypes',
+                    icon: <i class="fa fa-archive" aria-hidden="true"></i>
                 }
             ]
-        },
-        {
-            title: 'Forms',
-            path: '/manageforms',
-            icon: <i class="fa fa-home" aria-hidden="true"></i>
         },
         {
             title: 'Requests',
@@ -103,6 +103,29 @@ export const SidebarData = [
                     path: '/admin/requests/trash',
                     icon: <i class="fa fa-trash" aria-hidden="true"></i>
                 }
+            ]
+        },
+        {
+            title: 'Others',
+            icon: <i class="fa fa-users" aria-hidden="true"></i>,
+            iconClosed: <i class="fa fa-chevron-circle-down" aria-hidden="true"></i>,
+            iconOpened: <i class="fa fa-chevron-circle-up" aria-hidden="true"></i>,
+            subNav: [
+                {
+                    title: 'Courses',
+                    path: '/admin/courses',
+                    icon: <i class="fa fa-home" aria-hidden="true"></i>
+                },
+                {
+                    title: 'Forms',
+                    path: '/admin/manageforms',
+                    icon: <i class="fa fa-home" aria-hidden="true"></i>
+                },
+                {
+                    title: 'Students',
+                    path: '/admin/deptchair/students',
+                    icon: <i class="fa fa-trash" aria-hidden="true"></i>
+                },
             ]
         },
         {
@@ -158,13 +181,13 @@ export const SidebarData = [
                     title: 'Archived Announcements',
                     path: '/admin/archives/announcements',
                     icon: <i class="fa fa-archive" aria-hidden="true"></i>
+                },
+                {
+                    title: 'Announcement Types',
+                    path: '/admin/announcementTypes',
+                    icon: <i class="fa fa-archive" aria-hidden="true"></i>
                 }
             ]
-        },
-        {
-            title: 'Forms',
-            path: '/manageforms',
-            icon: <i class="fa fa-home" aria-hidden="true"></i>
         },
         {
             title: 'Requests',
@@ -200,20 +223,30 @@ export const SidebarData = [
             ]
         },
         {
-            title: 'Users',
+            title: 'Others',
             icon: <i class="fa fa-user" aria-hidden="true"></i>,
             iconClosed: <i class="fa fa-chevron-circle-down" aria-hidden="true"></i>,
             iconOpened: <i class="fa fa-chevron-circle-up" aria-hidden="true"></i>,
             subNav: [
                 {
+                    title: 'Courses',
+                    path: '/admin/courses',
+                    icon: <i class="fa fa-home" aria-hidden="true"></i>
+                },
+                {
+                    title: 'Forms',
+                    path: '/admin/manageforms',
+                    icon: <i class="fa fa-home" aria-hidden="true"></i>
+                },
+                {
+                    title: 'User accounts',
+                    path: '/admin/users',
+                    icon: <i class="fa fa-list-ul" aria-hidden="true"></i>
+                },
+                {
                     title: 'Register User',
                     path: '/admin/register',
                     icon: <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                },
-                {
-                    title: 'View Users',
-                    path: '/admin/users',
-                    icon: <i class="fa fa-list-ul" aria-hidden="true"></i>
                 }
             ]
         },

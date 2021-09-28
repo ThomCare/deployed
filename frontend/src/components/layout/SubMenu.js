@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAlert } from 'react-alert'
 import { useDispatch } from 'react-redux'
-import styled from 'styled-components'
 import { logout } from '../../actions/userActions'
+import styled from 'styled-components'
 
 const SidebarLink = styled(Link)`
     display:flex;
@@ -44,34 +44,46 @@ const DropdownLink = styled(Link)`
     }`;
 
 const SubMenu = ({ item }) => {
+    const dispatch = useDispatch()
+    const alert = useAlert()
 
     const [subnav, setSubnav] = useState(false);
 
     const showSubnav = () => setSubnav(!subnav);
 
-    const dispatch = useDispatch()
-    const alert = useAlert()
-
     const logoutHandler = () => {
         dispatch(logout())
-        alert.success('Logged out successfully')
+        alert.success('Logged out successfully.')
+        // window.location.reload(true);
     }
 
     return (
         <>
-            <SidebarLink to={item.path} onClick={item.title === 'Log out' ? (() => logoutHandler()) : item.subNav && showSubnav}>
-                <div>
-                    {item.icon}
-                    <SidebarLabel>{item.title}</SidebarLabel>
-                </div>
-                <div>
-                    {item.subNav && subnav
-                        ? item.iconOpened
-                        : item.subNav
-                            ? item.iconClosed
-                            : null}
-                </div>
-            </SidebarLink>
+            {item.title === 'Log out' ?
+                <Fragment>
+                    <SidebarLink to='/' onClick={logoutHandler}>
+                        <div>
+                            {item.icon}
+                            <SidebarLabel>{item.title}</SidebarLabel>
+                        </div>
+                    </SidebarLink>
+                </Fragment> :
+                <Fragment>
+                    <SidebarLink to={item.path} onClick={item.subNav && showSubnav}>
+                        <div>
+                            {item.icon}
+                            <SidebarLabel>{item.title}</SidebarLabel>
+                        </div>
+                        <div>
+                            {item.subNav && subnav
+                                ? item.iconOpened
+                                : item.subNav
+                                    ? item.iconClosed
+                                    : null}
+                        </div>
+                    </SidebarLink>
+                </Fragment>
+            }
             {subnav && item.subNav.map((item, index) => {
                 return (
                     <DropdownLink to={item.path} key={index}>
@@ -79,7 +91,8 @@ const SubMenu = ({ item }) => {
                         <SidebarLabel>{item.title}</SidebarLabel>
                     </DropdownLink>
                 )
-            })}
+            })
+            }
         </>
     )
 }
