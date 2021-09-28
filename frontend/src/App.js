@@ -40,7 +40,6 @@ import SubmitRequest from './components/home/requests/SubmitRequest'
 import TrackingPage from './components/home/requests/TrackingPage'
 import TrackingPageProgress from './components/home/requests/TrackingPageProgress'
 
-
 //dashboard/announcements folder
 import ListAnnouncements from './components/dashboard/announcements/ListAnnouncements'
 import ListAnnouncementType from './components/dashboard/announcements/ListAnnouncementType'
@@ -89,11 +88,10 @@ import UpdateUser from './components/dashboard/users/UpdateUser'
 
 
 function App() {
-    const { loading } = useSelector(state => state.auth)
     const { dashboard } = useSelector(state => state.dashboard)
 
     useEffect(() => {
-        console.log('dispatching loadUser from App.js')
+
         store.dispatch(loadUser())
     }, [])
 
@@ -119,7 +117,6 @@ function App() {
                                     <Route path='/forgotpassword' component={ForgotPassword} exact />
                                     <Route path='/password/reset/:token' component={NewPassword} exact />
                                     <Route path='/register' component={Register} exact />
-                                    <Route path='/confirm/register' component={ConfirmRegister} exact />
                                     <Route path='/verify/account/:token' component={VerifyRegistration} exact />
 
                                 {/**FORMS ROUTES */}
