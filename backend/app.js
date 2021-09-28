@@ -32,14 +32,14 @@ app.use('/api/v1', announcementType)
 app.use('/api/v1', course)
 app.use('/api/v1', form)
 
-/*
+
 if(process.env.NODE_ENV === 'PRODUCTION'){
     app.use(express.static(path.join(__dirname, '../frontend/build')))
     app.get('*', (req,res)=>{
         res.sendFile(path.resolve(__dirname, '../frontend/build/index.html'))
     })
 }
-*/
+
 // Middleware to handle errors
 app.use(errorMiddleware);
 
