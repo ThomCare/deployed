@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect } from 'react'
+import { BarChart, Bar, XAxis, YAxis } from 'recharts'
 import { Link } from 'react-router-dom'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
@@ -10,14 +11,14 @@ import Sidebar from '../../layout/Sidebar'
 import MetaData from '../../layout/MetaData'
 import Loader from '../../layout/Loader'
 import ReportCard from './ReportCard'
-var dateFormat = require('dateformat')
+import dateformat from 'dateformat'
 
-const ControlPanel = () => {
+const ControlPanel = ({ history }) => {
     const dispatch = useDispatch()
     const alert = useAlert()
 
     const { user } = useSelector(state => state.auth)
-    const { loading: listLoading, error, requests, processing, pending, approved, denied } = useSelector(state => state.requests)
+    const { loading: listLoading, error, requests, processing, pending, approved, denied, stats } = useSelector(state => state.requests)
     const { loading: recentsLoading, error: recentsError, recents } = useSelector(state => state.recents)
 
     const role = user && user.role
@@ -38,7 +39,7 @@ const ControlPanel = () => {
         viewType = '1'
     }
 
-    const changeDateFormat = (date) => dateFormat(date, "yyyy-mm-dd")
+    const changeDateFormat = (date) => dateformat(date, "yyyy-mm-dd")
     const upperCase = (text) => text.toUpperCase()
 
     useEffect(() => {
@@ -52,13 +53,17 @@ const ControlPanel = () => {
         if (error) {
             alert.error(error)
             dispatch(clearErrors())
+
+            history.push('/error')
         }
 
         if (recentsError) {
             alert.error(error)
             dispatch(clearErrors())
+
+            history.push('/error')
         }
-    }, [dispatch, alert, error, role, reqType, recentsError])
+    }, [dispatch, history, alert, error, role, reqType, recentsError])
 
     const setRequests = () => {
         const data = {
@@ -124,6 +129,22 @@ const ControlPanel = () => {
         return data
     }
 
+    const setData = () => {
+        const data = [
+            {name: 'Today', uv: 0},
+            {name: '7d ago', uv: 0},
+            {name: '30d ago', uv: 0},
+            {name: '3m ago', uv: 0},
+            {name: '6m ago', uv: 0},
+            {name: 'A year ago', uv: 0}
+        ];
+
+        stats && stats.forEach((x, idx) => {
+            data[idx].uv = x
+        })
+        
+        return data
+    }
     return (
         <Fragment>
             <MetaData title={'Control Panel'} />
@@ -133,14 +154,25 @@ const ControlPanel = () => {
                     <div className="">
                         <h1 style={{margin: '50px 0'}}>Control Panel</h1>
                         <Container fluid>
+                            {user.role !== 'Student' ? (
+                                <Fragment>
+                                    <Row style={{ display: 'flex', justifyContent: 'center', margin: '50px' }}>
+                                        <BarChart width={600} height={300} data={setData()}>
+                                            <XAxis dataKey="name" />
+                                            <YAxis />
+                                            <Bar dataKey="uv" barSize={30} fill="#8884d8"  label={"Requests"}/>
+                                        </BarChart>
+                                    </Row>
+                                </Fragment>
+                            ) : <Fragment></Fragment>}
                             <Row style={{ display: 'flex', justifyContent: 'center' }}>
                                 {user.role === 'Student' ? (
                                     <Fragment>
-                                        <Col sm><ReportCard requestType={'Requests'} length={requests && requests.length} icon={'pencil'} color={'red'}/></Col>
+                                        <Col sm><ReportCard requestType={'Requests'} length={requests && requests.length} icon={'edit'} color={'red'}/></Col>
                                     </Fragment>
                                 ) : (
                                     <Fragment>
-                                        <Col sm><ReportCard requestType={'Requests'} length={requests && requests.length} icon={'pencil'} color={'red'}/></Col>
+                                        <Col sm><ReportCard requestType={'Requests'} length={requests && requests.length} icon={'edit'} color={'red'}/></Col>
                                         <Col sm><ReportCard requestType={'Pending'} length={pending && pending.length} icon={'paperclip'} color={'blue'}/></Col>
                                         <Col sm><ReportCard requestType={'Processing'} length={processing && processing.length} icon={'spinner'} color={'yellow'}/></Col>
                                         <Col sm><ReportCard requestType={'Denied'} length={denied && denied.length} icon={'times-circle'} color={'blue'}/></Col>

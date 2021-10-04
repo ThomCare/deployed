@@ -12,7 +12,7 @@ const FormsList = () => {
                 </div>
             </Container>
             <Container fluid style={{ paddingTop: '38px' }}>
-                <Table bordered striped size="sm" style={{ paddingTop: '100px', marginTop: '50px', justifyContent: 'center' }}>
+                <Table bordered hover size="sm" style={{ paddingTop: '100px', marginTop: '50px', justifyContent: 'center' }}>
                     <thead>
                         <tr style={{ textAlign: 'center' }}>
                             <th>Document Code</th>
@@ -27,7 +27,7 @@ const FormsList = () => {
                             <td>
                                 <Link to='/forms/form-6a'>
                                     <Button variant="primary" style={{ margin: '5px' }}>
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Fill out
+                                        <i class="fa fa-edit-square-o" aria-hidden="true"></i> Fill out
                                     </Button>
                                 </Link>
                                 <Button variant="warning" href="https://drive.google.com/file/d/1T5FATdMcVEhhTsfrqkEOKudhWF7rkvE_/view?usp=sharing" target="_blank" rel="noreferrer" style={{ margin: '5px' }}>
@@ -41,33 +41,21 @@ const FormsList = () => {
                             <td>
                                 <Link to='/forms/form-6b'>
                                     <Button variant="primary" style={{ margin: '5px' }}>
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Fill out
+                                        <i class="fa fa-edit-square-o" aria-hidden="true"></i> Fill out
                                     </Button>
                                 </Link>
-                                <Button variant="warning" href="https://drive.google.com/file/d/1T5FATdMcVEhhTsfrqkEOKudhWF7rkvE_/view?usp=sharing" target="_blank" rel="noreferrer" style={{ margin: '5px' }}>
+                                <Button variant="warning" href="https://drive.google.com/file/d/1JFb7kCERjKkJZXJbkmdACewAobS7i_UF/view?usp=sharing" target="_blank" rel="noreferrer" style={{ margin: '5px' }}>
                                     <i class="fa fa-eye" aria-hidden="true"></i> View
                                 </Button></td>
                         </tr>
-                        <tr>
-                            <td>Petition Form</td>
-                            <td>CICS Petition Classes</td>
-                            <td>
-                                <Link to='/forms/petition-classes'>
-                                    <Button variant="primary" style={{ margin: '5px' }}>
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Fill out
-                                    </Button>
-                                </Link>
-                                <Button variant="warning" href="https://drive.google.com/file/d/1T5FATdMcVEhhTsfrqkEOKudhWF7rkvE_/view?usp=sharing" target="_blank" rel="noreferrer" style={{ margin: '5px' }}>
-                                    <i class="fa fa-eye" aria-hidden="true"></i> View
-                                </Button></td>
-                        </tr>
+                        
                         <tr>
                             <td>Overload Form</td>
                             <td>Request for Overload</td>
                             <td>
                                 <Link to='/forms/overload-form'>
                                     <Button variant="primary" style={{ margin: '5px' }}>
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Fill out
+                                        <i class="fa fa-edit-square-o" aria-hidden="true"></i> Fill out
                                     </Button>
                                 </Link>
                                 <Button variant="warning" href="https://drive.google.com/file/d/1T5FATdMcVEhhTsfrqkEOKudhWF7rkvE_/view?usp=sharing" target="_blank" rel="noreferrer" style={{ margin: '5px' }}>

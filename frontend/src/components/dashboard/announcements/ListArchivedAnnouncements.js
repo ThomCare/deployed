@@ -4,13 +4,14 @@ import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import { Container, Modal, Button } from 'react-bootstrap'
 import { MDBDataTableV5 } from 'mdbreact'
+import { Markup } from 'interweave'
 import { getArchivedAnnouncements, deleteAnnouncement, clearErrors } from '../../../actions/announcementActions'
 import { DELETE_ANNOUNCEMENT_RESET } from '../../../constants/announcementConstants'
 import { INSIDE_DASHBOARD_TRUE } from '../../../constants/dashboardConstants'
 import Sidebar from '../../layout/Sidebar'
 import MetaData from '../../layout/MetaData'
 import Loader from '../../layout/Loader'
-var dateFormat = require('dateformat')
+import dateformat from 'dateformat'
 
 const ListArchivedAnnouncements = ({ history }) => {
     const alert = useAlert()
@@ -25,12 +26,25 @@ const ListArchivedAnnouncements = ({ history }) => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    const shortenDescription = (description) => {
+        let y = description.split(' ')
+        let z = description.split(' ').slice(0, 50).join(' ')
+
+        if (y.length > 50) {
+            z = z + '...'
+        }
+
+        return z
+    }
+
     useEffect(() => {
         dispatch(getArchivedAnnouncements())
 
         if (error) {
             alert.error(error)
             dispatch(clearErrors())
+
+            history.push('/error')
         }
 
         if (deleteError) {
@@ -52,7 +66,7 @@ const ListArchivedAnnouncements = ({ history }) => {
         })
     }, [dispatch, history, alert, error, isDeleted, deleteError])
 
-    const changeDateFormat = (date) => dateFormat(date, "mmm d, yyyy h:MMtt")
+    const changeDateFormat = (date) => dateformat(date, "mmm d, yyyy h:MMtt")
 
     const deleteAnnouncementHandler = (id) => {
         dispatch(deleteAnnouncement(id))
@@ -96,7 +110,7 @@ const ListArchivedAnnouncements = ({ history }) => {
             data.rows.push({
                 date: changeDateFormat(announcement.createdAt),
                 title: announcement.title,
-                description: announcement.description,
+                description: <Fragment><Markup content={shortenDescription(announcement.description)}/></Fragment>,
                 tags: <Fragment>
                     <span>
                         <p style={{ margin: '0' }}><b>Year Level: </b>{announcement.yearLevel}</p>
@@ -108,7 +122,7 @@ const ListArchivedAnnouncements = ({ history }) => {
                 actions: <Fragment>
                     <Link to={`/admin/announcement/${announcement._id}`}>
                         <Button variant="primary" className="mr-5" style={{ margin: '5px' }}>
-                            <i class="fa fa-pencil" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
+                            <i class="fa fa-edit" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
                         </Button>
                     </Link>
                     <Button variant="danger" className="mr-5" style={{ margin: '5px' }} onClick={() => {

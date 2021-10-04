@@ -2,18 +2,19 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
+import { FloatingLabel, Row, Container, Button, Col, Card, Form, Breadcrumb } from 'react-bootstrap'
+import TimePicker from 'react-time-picker'
 import { getCourses, clearErrors } from '../../../../actions/courseActions'
+import { INSIDE_DASHBOARD_FALSE } from '../../../../constants/dashboardConstants'
 import MetaData from '../../../layout/MetaData'
 import Loader from '../../../layout/Loader'
-import { FloatingLabel, Row, Container, Button, Col, Card, Form, Breadcrumb } from 'react-bootstrap'
 import FORM6BPDF from '../templates/FORM6BPDF'
-import { INSIDE_DASHBOARD_FALSE } from '../../../../constants/dashboardConstants'
 
 const addDropStyle = {
     marginBottom: '5px'
 }
 
-function Form6B() {
+function Form6B({history}) {
     const alert = useAlert()
     const dispatch = useDispatch()
 
@@ -25,34 +26,30 @@ function Form6B() {
     const [year2, setYear2] = useState('')
     const [submitted, setSubmitted] = useState(false)
     const [studentInfo, setStudentInfo] = useState({})
+    const [middleInitial, setMiddleInitial] = useState('')
+    const [inputFields, setInputFields] = useState([{
+        status: '',
+        courseCode: '',
+        courseName: '',
+        lecUnits: '',
+        labUnits: '',
+        days: '',
+        time: '',
+        room: '',
+        section: ''
+    }])
 
-    const [inputFields, setInputFields] = useState([
-        {
-            status: '',
-            courseCode: '',
-            courseName: '',
-            lecUnits: '',
-            labUnits: '',
-            days: '',
-            time: '',
-            room: '',
-            section: ''
-        }
-    ])
+    const title = 'Form 6B - Cross-Enrollment Form'
 
-    const title = 'Cross-Enrollment Form'
+    const getMiddleInitial = (name) => {
+        const middleName = name ? name.split(' ') : ''
+        let mi = ''
 
-    useEffect(() => {
-        dispatch(getCourses())
-
-        if (error) {
-            alert.error(error)
-            dispatch(clearErrors())
-        }
-        dispatch({
-            type: INSIDE_DASHBOARD_FALSE
+        middleName && middleName.forEach(x => {
+            mi += x[0]
         })
-    }, [dispatch, alert, error])
+        return mi
+    }
 
     const addRow = () => {
         setInputFields([...inputFields, {
@@ -62,7 +59,8 @@ function Form6B() {
             lecUnits: '',
             labUnits: '',
             days: '',
-            time: '',
+            startTime: '',
+            endTime: '',
             room: '',
             section: ''
         }])
@@ -91,6 +89,21 @@ function Form6B() {
         }
     }
 
+    useEffect(() => {
+        dispatch(getCourses())
+        setMiddleInitial(getMiddleInitial(user.middleName))
+
+        if (error) {
+            alert.error(error)
+            dispatch(clearErrors())
+            history.push('/forms/list')
+        }
+
+        dispatch({
+            type: INSIDE_DASHBOARD_FALSE
+        })
+    }, [dispatch, history, alert, error, user])
+
     const onChange = (index, e) => {
         e.preventDefault()
         const values = [...inputFields]
@@ -109,6 +122,34 @@ function Form6B() {
         setInputFields(values)
     }
 
+    const onTimeChange = (index, name, value) => {
+        const values = [...inputFields]
+        let aa = 'AM', time=''
+
+        let hr = value.substring(0,2)
+
+        if(Number(hr) > 12) {
+            aa = 'PM'
+            time = hr - 12 + value.substring(2,5) + aa
+            values[index][name] = time
+        } else if (Number(hr) === 12) {
+            aa = 'PM'
+            time = value + aa
+            values[index][name] = time
+        } else {
+            aa = 'AM'
+
+            if(Number(hr) === 0) {
+                time = '12' + value.substring(2,5) + aa
+            } else {
+                time = value + aa
+            }
+            values[index][name] = time
+        }
+
+        setInputFields(values)
+    }
+
     const submitHandler = e => {
         e.preventDefault()
 
@@ -119,7 +160,7 @@ function Form6B() {
             studentNumber: user.studentNumber,
             email: user.email,
             course: user.course,
-            addDrop: inputFields,
+            crossDrop: inputFields,
             term,
             year1,
             year2
@@ -141,37 +182,32 @@ function Form6B() {
                             </Breadcrumb>
                         </Card.Header>
                         <Card.Body>
-                            <Card.Title style={{ margin: '10px 0 20px 0', color: '#9c0b0b', fontWeight: 'bold', textAlign: 'center' }}>CROSS ENROLLMENT (WITHIN CICS) FORM</Card.Title>
+                            <Card.Title style={{ margin: '10px 0 20px 0', color: '#9c0b0b', fontWeight: 'bold', textAlign: 'center' }}>{title}</Card.Title>
                             <Card.Title style={{ margin: '10px 0 20px 0', color: 'black', fontWeight: 'bold' }}>Student Information</Card.Title>
                             <Form style={{ color: 'black' }} onSubmit={submitHandler} >
                                 <Row className="mb-3">
-                                    <Form.Group as={Col} xs={12} sm={12} md={4}>
+                                    <Form.Group as={Col} xs={12} md={5} controlId="formGridEmail">
                                         <Form.Label>First Name</Form.Label>
                                         <Form.Control type="text" value={user && user.firstName} readOnly />
                                     </Form.Group>
-
-                                    <Form.Group as={Col} xs={12} sm={6} md={4}>
+                                    <Form.Group as={Col} xs={12} md={3} controlId="formGridEmail">
                                         <Form.Label>Middle Initial</Form.Label>
-                                        <Form.Control type="text" placeholder="(Optional)" value={user && user.middleName ? user.middleName[0] : ''} readOnly />
+                                        <Form.Control type="text" placeholder="(Optional)" value={middleInitial} readOnly />
                                     </Form.Group>
-
-                                    <Form.Group as={Col}xs={12} sm={6} md={4}>
+                                    <Form.Group as={Col} xs={12} md={4} controlId="formGridEmail">
                                         <Form.Label>Last Name</Form.Label>
                                         <Form.Control type="text" value={user && user.lastName} readOnly />
                                     </Form.Group>
                                 </Row>
-
                                 <Row className="mb-3">
                                     <Form.Group as={Col} xs={12} sm={6} md={6} lg={4}>
                                         <Form.Label>Student Number</Form.Label>
                                         <Form.Control value={user && user.studentNumber} readOnly />
                                     </Form.Group>
-
                                     <Form.Group as={Col} xs={12} sm={6} md={6} lg={4}>
                                         <Form.Label>Course/Program</Form.Label>
                                         <Form.Control type="text" value={user && user.course} readOnly />
                                     </Form.Group>
-
                                     <Form.Group as={Col} xs={12} sm={12} md={12} lg={4}>
                                         <Form.Label>Email address</Form.Label>
                                         <Form.Control type='email' value={user && user.email} readOnly />
@@ -179,17 +215,15 @@ function Form6B() {
                                 </Row>
                                 <Row className="mb-3" style={{paddingBottom:'30px'}}>
                                     <Form.Group as={Col} xs={12} sm={12} md={6}>
-                                        <Form.Label>Term</Form.Label>
+                                        <Form.Label>Term/Special</Form.Label>
                                         <Form.Control type="text" placeholder="1st" value={term} onChange={e => setTerm(e.target.value)} required />
                                     </Form.Group>
-
                                     <Row as={Col}>
                                         <Row>
                                             <Form.Group as={Col} xs={12}>
                                                 <Form.Label>Academic Year </Form.Label>
                                             </Form.Group>
                                         </Row>
-
                                         <Row>
                                             <Col xs={1} sm={2}>
                                                 <Form.Label>20</Form.Label>
@@ -206,158 +240,177 @@ function Form6B() {
                                         </Row>
                                     </Row>
                                 </Row>
-
                                 <Card.Title 
-                                style={{ margin: '5px 0 20px 0',
-                                         color: 'black', 
-                                         fontWeight: 'bold',
-                                         
-                                         paddingTop: '20px'
-                                         
-                                         
-                                        }}>Courses to Cross-enroll / Drop
+                                    style={{
+                                        margin: '5px 0 20px 0',
+                                        color: 'black', 
+                                        fontWeight: 'bold',
+                                        paddingTop: '20px'
+                                    }}
+                                >
+                                    Courses to Cross-enroll / Drop
                                 </Card.Title>
-                                {
-                                    inputFields.map((val, idx) => {
-                                        //set unique id per row
-                                        let status = `status-${idx}`,
-                                            courseCode = `courseCode-${idx}`,
-                                            courseName = `courseName-${idx}`,
-                                            lecUnits = `lecUnits-${idx}`,
-                                            labUnits = `labUnits-${idx}`,
-                                            days = `days-${idx}`,
-                                            time = `time-${idx}`,
-                                            room = `room-${idx}`,
-                                            section = `section-${idx}`
+                                {inputFields.map((val, idx) => {
+                                    //set unique id per row
+                                    let status = `status-${idx}`,
+                                        courseCode = `courseCode-${idx}`,
+                                        courseName = `courseName-${idx}`,
+                                        lecUnits = `lecUnits-${idx}`,
+                                        labUnits = `labUnits-${idx}`,
+                                        days = `days-${idx}`,
+                                        startTime = `startTime-${idx}`,
+                                        endTime = `endTime-${idx}`,
+                                        room = `room-${idx}`,
+                                        section = `section-${idx}`
 
-                                        return (
-                                            <Fragment key={val.index}>
-                                                <Row>
-                                                    <Col style={{paddingTop: '13px'}}>
-                                                <p>Courses to Cross-enroll/Drop #{idx + 1}</p>
+                                    return (
+                                        <Fragment key={val.index}>
+                                            <Row>
+                                                <Col style={{paddingTop: '13px'}}>
+                                                    <p>Courses to Cross-enroll/Drop #{idx + 1}</p>
                                                 </Col>
                                                 <Col xs={4} sm={4} md={3} lg={2} style={{ textAlign: 'right', marginBottom: '5px' }}>
-                                                        {
-                                                            idx === 0 ? (
-                                                                <Button variant='primary' onClick={() => addRow()} style={{ width: '40px' }}>
-                                                                    <i className="fa fa-plus-circle" aria-hidden="true"></i>
-                                                                </Button>
+                                                    {idx === 0 ? (
+                                                        <Button variant='primary' onClick={() => addRow()} style={{ width: '40px' }}>
+                                                            <i className="fa fa-plus-circle" aria-hidden="true"></i>
+                                                        </Button>
+                                                    ) : (
+                                                        <Fragment>
+                                                            <Button variant='primary' onClick={() => addRow()} style={{ width: '40px', marginLeft: '5px' }}>
+                                                                <i className="fa fa-plus-circle" aria-hidden="true"></i>
+                                                            </Button>
+                                                            <Button variant='danger' onClick={() => deleteRow(idx)} style={{ width: '40px', marginLeft: '5px' }}>
+                                                                <i className="fa fa-minus" aria-hidden="true"></i>
+                                                            </Button>
+                                                        </Fragment>
+                                                    )}
+                                                </Col>
+                                            </Row>
+                                            <Row style={{ marginBottom: '10px' }}>
+                                                <Col xs={12} md={6} lg={2} style={addDropStyle}  >
+                                                    <FloatingLabel label="Cross-enroll/Drop">
+                                                        <Form.Select aria-label="Default select example" name="status" id={status} data-id={idx} value={val.status} onChange={e => onChange(idx, e)} required>
+                                                            <option value=''>Cross-enroll/Drop</option>
+                                                            <option value="Cross-enroll">Cross-enroll</option>
+                                                            <option value="Drop">Drop</option>
+                                                        </Form.Select>
+                                                    </FloatingLabel>
+                                                </Col>
+                                                <Col xs={12} md={6} lg={2} style={addDropStyle}>
+                                                    <FloatingLabel label="Course Code">
+                                                        <Form.Select aria-label="Default select example" name="courseCode" id={courseCode} data-id={idx} value={val.courseCode} onChange={e => onChange(idx, e)} required>
+                                                            <option value=''>Course Code</option>
+                                                            {courses && courses.map(course => (
+                                                                <option value={course.courseCode}>{course.courseCode}</option>
+                                                            ))}
+                                                        </Form.Select>
+                                                    </FloatingLabel>
+                                                </Col>
+                                                <Col xs={12} md={12} lg={4} style={addDropStyle}>
+                                                    <FloatingLabel label="Course Name">
+                                                        <Form.Control type="text" placeholder="Course Name" name="courseName" id={courseName} data-id={idx} value={val.courseName} onChange={e => onChange(idx, e)} readOnly />
+                                                    </FloatingLabel>
+                                                </Col>
+                                                <Col xs={6} sm={6} md={4} lg={2} style={addDropStyle}>
+                                                    <FloatingLabel label="Lec Units">
+                                                        <Form.Control type="number" placeholder="Lec Units" name="lecUnits" id={lecUnits} data-id={idx} value={val.lecUnits} onChange={e => onChange(idx, e)} readOnly />
+                                                    </FloatingLabel>
+                                                </Col>
+                                                <Col xs={6} sm={6} md={4} lg={2} style={addDropStyle}>
+                                                    <FloatingLabel label="Lab Units">
+                                                        <Form.Control type="number" placeholder="Lab Units" name="labUnits" id={labUnits} data-id={idx} value={val.labUnits} onChange={e => onChange(idx, e)} readOnly />
+                                                    </FloatingLabel>
+                                                </Col>
+                                                <Col xs={6} sm={6} md={4} lg={3} style={addDropStyle}>
+                                                    <FloatingLabel label="Days">
+                                                        <Form.Select aria-label="Default select example" placeholder='M' name="days" id={days} data-id={idx} value={val.days} onChange={e => onChange(idx, e)} required >
+                                                            <option value=''>Days</option>
+                                                            <option value='M'>M</option>
+                                                            <option value='T'>T</option>
+                                                            <option value='W'>W</option>
+                                                            <option value='Th'>Th</option>
+                                                            <option value='F'>F</option>
+                                                            <option value='S'>S</option>
+                                                            <option value='Su'>Su</option>
+                                                        </Form.Select>
+                                                    </FloatingLabel>
+                                                </Col>
+                                                <Col xs={6} sm={6} md={4} lg={5} style={addDropStyle}>
+                                                    <Row className="mt-3">
+                                                        <Form.Group as={Col} xs={6}>
+                                                            <Form.Label>Start Time</Form.Label>
+                                                            <TimePicker
+                                                                disableClock
+                                                                name="startTime"
+                                                                id={startTime}
+                                                                data-id={idx}
+                                                                value={val.startTime}
+                                                                onChange={value =>  {
 
-                                                            ) : (
-                                                                <Fragment>
-                                                                    <Button variant='primary' onClick={() => addRow()} style={{ width: '40px', marginLeft: '5px' }}>
-                                                                        <i className="fa fa-plus-circle" aria-hidden="true"></i>
-                                                                    </Button>
-                                                                    <Button variant='danger' onClick={() => deleteRow(idx)} style={{ width: '40px', marginLeft: '5px' }}>
-                                                                        <i className="fa fa-minus" aria-hidden="true"></i>
-                                                                    </Button>
-                                                                </Fragment>
-                                                            )
-                                                        }
-                                                    </Col>
-                                                </Row>
+                                                                    // ? value === null if and only if AM/PM is selected
+                                                                    // ? value = jsonobject & null when selected but time is not complete
+                                                                    // ? value is time when complete
 
-                                                <Row style={{ marginBottom: '10px' }}>
-                                                    
-                                                    <Col xs={12} md={3} lg={3} style={addDropStyle}  >
-                                                        <FloatingLabel
-                                                            label="Cross-enroll/Drop"
-                                                            
-                                                        > 
-                                                            <Form.Select aria-label="Default select example" name="status" id={status} data-id={idx} value={val.status} onChange={e => onChange(idx, e)} required>
-                                                                <option value=''>Cross-enroll/Drop</option>
-                                                                <option value="Add">Cross-enroll</option>
-                                                                <option value="Drop">Drop</option>
-                                                            </Form.Select>
-                                                        </FloatingLabel>
-                                                    </Col>
-                                                    <Col xs={12} md={4} lg={2} style={addDropStyle}>
-                                                        <FloatingLabel
-                                                            label="Course Code"
-                                                        >
-                                                            <Form.Select aria-label="Default select example" name="courseCode" id={courseCode} data-id={idx} value={val.courseCode} onChange={e => onChange(idx, e)} required>
-                                                                <option value=''>Course Code</option>
-                                                                {courses && courses.map(course => (
-                                                                    <option value={course.courseCode}>{course.courseCode}</option>
-                                                                ))}
-                                                            </Form.Select>
-                                                        </FloatingLabel>
-                                                    </Col>
-                                                    <Col xs={12} md={5} lg={7} style={addDropStyle}>
-                                                        <FloatingLabel
-                                                            label="Course Name"
-                                                        >
-                                                            <Form.Control type="text" placeholder="Course Name" name="courseName" id={courseName} data-id={idx} value={val.courseName} onChange={e => onChange(idx, e)} readOnly />
-                                                        </FloatingLabel>
-                                                    </Col>
-                                                    <Col xs={12} sm={6} md={2} lg={2} style={addDropStyle}>
-                                                        <FloatingLabel
-                                                            label="Lec Units"
-                                                        >
-                                                            <Form.Control type="number" placeholder="Lec Units" name="lecUnits" id={lecUnits} data-id={idx} value={val.lecUnits} onChange={e => onChange(idx, e)} readOnly />
-                                                        </FloatingLabel>
-                                                    </Col>
-                                                    <Col xs={12} sm={6} md={2} lg={2} style={addDropStyle}>
-                                                        <FloatingLabel
-                                                            label="Lab Units"
-                                                        >
-                                                            <Form.Control type="number" placeholder="Lab Units" name="labUnits" id={labUnits} data-id={idx} value={val.labUnits} onChange={e => onChange(idx, e)} readOnly />
-                                                        </FloatingLabel>
-                                                    </Col>
-                                                    <Col xs={12} sm={6} md={3} lg={2} style={addDropStyle}>
-                                                        <FloatingLabel
-                                                            label="Days"
-                                                        >
-                                                            <Form.Select aria-label="Default select example" placeholder='M' name="days" id={days} data-id={idx} value={val.days} onChange={e => onChange(idx, e)} required >
-                                                                <option value=''>Days</option>
-                                                                <option value='M'>M</option>
-                                                                <option value='T'>T</option>
-                                                                <option value='W'>W</option>
-                                                                <option value='Th'>Th</option>
-                                                                <option value='F'>F</option>
-                                                                <option value='S'>S</option>
-                                                                <option value='Su'>Su</option>
-                                                            </Form.Select>
-                                                        </FloatingLabel>
-                                                    </Col>
-                                                    <Col xs={12} sm={6} md={5} lg={2} style={addDropStyle}>
-                                                        <FloatingLabel
-                                                            label="Time"
-                                                        >
-                                                            <Form.Control type="text" placeholder="Time" name="time" id={time} data-id={idx} value={val.time} onChange={e => onChange(idx, e)} required />
-                                                        </FloatingLabel>
-                                                    </Col>
-                                                    <Col xs={12} sm={4} md={4} lg={2} style={addDropStyle}>
-                                                        <FloatingLabel
-                                                            label="Room Number"
-                                                        >
-                                                            <Form.Control type="text" placeholder="Room number" name="room" id={room} data-id={idx} value={val.room} onChange={e => onChange(idx, e)} required />
-                                                        </FloatingLabel>
-                                                    </Col>
-                                                    <Col xs={8} sm={4} md={5} lg={2} style={addDropStyle}>
-                                                        <FloatingLabel
-                                                            label="Section"
-                                                        >
-                                                            <Form.Control type="text" placeholder="Section" name="section" id={section} data-id={idx} value={val.section} onChange={e => onChange(idx, e)} required />
-                                                        </FloatingLabel>
-                                                    </Col>
-                                                    
-                                                    
-                                                    
-                                                </Row>
-                                            </Fragment>
-                                        )
-                                    }
-                                    )
+                                                                    if (value !== null) {
+                                                                        if (value.isDefaultPrevented && value.isDefaultPrevented.name === "functionThatReturnsFalse") {
+                                                                        
+                                                                        } else {
+                                                                            if (value) {
+                                                                                onTimeChange(idx, "startTime", value)
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </Form.Group>
+                                                        <Form.Group as={Col} xs={6}>
+                                                            <Form.Label>End Time</Form.Label>
+                                                            <TimePicker
+                                                                disableClock
+                                                                name="endTime"
+                                                                id={endTime}
+                                                                data-id={idx}
+                                                                value={val.endTime}
+                                                                onChange={value =>  {
+                                                                    // ? value === null if and only if AM/PM is selected
+                                                                    // ? value = jsonobject & null when selected but time is not complete
+                                                                    // ? value is time when complete
+
+                                                                    if (value !== null) {
+                                                                        if (value.isDefaultPrevented && value.isDefaultPrevented.name === "functionThatReturnsFalse") {
+                                                                        
+                                                                        } else {
+                                                                            if (value) {
+                                                                                onTimeChange(idx, "endTime", value)
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </Form.Group>
+                                                    </Row>
+                                                </Col>
+                                                <Col xs={6} sm={6} md={4} lg={2} style={addDropStyle}>
+                                                    <FloatingLabel label="Room Number">
+                                                        <Form.Control type="text" placeholder="Room number" name="room" id={room} data-id={idx} value={val.room} onChange={e => onChange(idx, e)} required />
+                                                    </FloatingLabel>
+                                                </Col>
+                                                <Col xs={6} sm={6} md={4} lg={2} style={addDropStyle}>
+                                                    <FloatingLabel label="Section">
+                                                        <Form.Control type="text" placeholder="Section" name="section" id={section} data-id={idx} value={val.section} onChange={e => onChange(idx, e)} required />
+                                                    </FloatingLabel>
+                                                </Col>
+                                            </Row>
+                                        </Fragment>
+                                    )})
                                 }
-
-                                <center><Button type='submit' style={{ marginTop: '10px', borderRadius: '50px', width: '10rem' }}>Generate Form</Button></center>
+                                <center><Button type='submit' style={{ marginTop: '10px', borderRadius: '50px', width: '10rem' }} disabled={user.role !== 'Student' ? true : false}>Generate Form</Button></center>
                             </Form>
                         </Card.Body>
                     </Card>
-                </Container>
+                </Container> 
             ) : (
-                <FORM6BPDF title={`Download Cross-Enrollment Form`} content={studentInfo} submitted={submitted} setSubmitted={setSubmitted}/>
+                <FORM6BPDF title={`Download Cross-Enrollment Form`} studentInfo={studentInfo} submitted={submitted} setSubmitted={setSubmitted}/>
             )}
         </Fragment>
     )

@@ -7,11 +7,11 @@ const Audit = require('../models/audit');
 const cloudinary = require('cloudinary').v2;
 const requestNotification = require('../config/templates/requestNotification')
 
-const requestTypeOfficeStaff = ['Request for Certificate of Grades', 'Request for Course Description', 'Others'];
+const requestTypeOfficeStaff = ['Request for Certificate of Grades', 'Request for Course Description', 'Others', 'Request for Leave of Absence', 'Submission of Admission Memo'];
 const resPerPage = 5
 
 // Submit new request => /api/v1/submitRequest
-exports.submitRequest = catchAsyncErrors(async (req, res, next) => {
+exports.submitRequest = catchAsyncErrors(async(req, res, next) => {
     const { requestType, yearLevel, section, notes } = req.body
     const fileRequirements = req.files
 
@@ -53,8 +53,14 @@ exports.submitRequest = catchAsyncErrors(async (req, res, next) => {
         case "Request for Certificate of Grades":
             trackStart = '11'
             break
-        case "Others":
+        case "Request for Leave of Absence":
             trackStart = '12'
+            break
+        case "Submission of Admission Memo":
+            trackStart = '13'
+            break
+        case "Others":
+            trackStart = '14'
             break
     }
 
@@ -96,14 +102,14 @@ exports.submitRequest = catchAsyncErrors(async (req, res, next) => {
 })
 
 // Request Tracker => /api/v1/requestTracker
-exports.requestTracker = catchAsyncErrors(async (req, res, next) => {
+exports.requestTracker = catchAsyncErrors(async(req, res, next) => {
     const trackingNumber = req.body.trackingNumber
     const lastName = req.body.lastName
     const request = await Request.findOne({ trackingNumber })
-    
-    if (!request) { return next(new ErrorHandler(`Request with Tracking Number: (${trackingNumber}) does not exist`)) }
-    
-    if (request.requestorInfo.lastName !== lastName) { return next(new ErrorHandler(`Last name does not match with the request surname`)) }
+
+    if (!request) { return next(new ErrorHandler(`Request does not exist`)) }
+
+    if (request.requestorInfo.lastName !== lastName) { return next(new ErrorHandler(`Tracking number and surname do not match.`)) }
 
     res.status(200).json({
         success: true,
@@ -112,11 +118,11 @@ exports.requestTracker = catchAsyncErrors(async (req, res, next) => {
 })
 
 // Get single request => /api/v1/request/:requestId
-exports.getSingleRequest = catchAsyncErrors(async (req, res, next) => {
+exports.getSingleRequest = catchAsyncErrors(async(req, res, next) => {
     const request = await Request.findById(req.params.requestId);
 
     if (!request) { return next(new ErrorHandler('Request Id does not exist')) }
-   
+
     res.status(200).json({
         success: true,
         request
@@ -125,7 +131,7 @@ exports.getSingleRequest = catchAsyncErrors(async (req, res, next) => {
 
 
 // Get all user submitted request => /api/v1/myRequests
-exports.getMyRequests = catchAsyncErrors(async (req, res, next) => {
+exports.getMyRequests = catchAsyncErrors(async(req, res, next) => {
     const getRequests = new APIFeatures(Request.find({ requestedById: req.user.id }).sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
@@ -146,7 +152,7 @@ exports.getMyRequests = catchAsyncErrors(async (req, res, next) => {
 })
 
 // Get all requests involving specific department chair => /api/v1/deptChair/requests
-exports.getDeptChairRequests = catchAsyncErrors(async (req, res, next) => {
+exports.getDeptChairRequests = catchAsyncErrors(async(req, res, next) => {
     let deptCourse = ''
 
     switch (req.user.role) {
@@ -165,38 +171,38 @@ exports.getDeptChairRequests = catchAsyncErrors(async (req, res, next) => {
     }
 
     const getRequests = new APIFeatures(Request.find({ "requestorInfo.course": deptCourse, isTrash: false, requestType: { $nin: requestTypeOfficeStaff } })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRecents = new APIFeatures(Request.find({ "requestorInfo.course": deptCourse, isTrash: false, requestType: { $nin: requestTypeOfficeStaff } })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
         .pagination(resPerPage)
 
     const getRequestsPending = new APIFeatures(Request.find({ "requestorInfo.course": deptCourse, requestStatus: 'Pending', isTrash: false, requestType: { $nin: requestTypeOfficeStaff } })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsProcessing = new APIFeatures(Request.find({ "requestorInfo.course": deptCourse, requestStatus: 'Processing', isTrash: false, requestType: { $nin: requestTypeOfficeStaff } })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsApproved = new APIFeatures(Request.find({ "requestorInfo.course": deptCourse, requestStatus: 'Approved', isTrash: false, requestType: { $nin: requestTypeOfficeStaff } })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsDenied = new APIFeatures(Request.find({ "requestorInfo.course": deptCourse, requestStatus: 'Denied', isTrash: false, requestType: { $nin: requestTypeOfficeStaff } })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsCrossEnrollment = new APIFeatures(Request.find({ isTrash: false, requestType: 'Cross Enrollment within CICS' })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
@@ -208,6 +214,30 @@ exports.getDeptChairRequests = catchAsyncErrors(async (req, res, next) => {
     const denied = await getRequestsDenied.query;
     const crossEnrollment = await getRequestsCrossEnrollment.query;
 
+
+    const dateToday = new Date(Date.now()).setHours(0,0,0,0)
+    const dateTomorrow = new Date(Date.now() + (24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+    const dateLastWeek = new Date(Date.now() - (7 * 24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+    const dateLastMonth = new Date(Date.now() - (30 * 24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+    const dateLast3Months = new Date(Date.now() - (90 * 24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+    const dateLast6Months = new Date(Date.now() - (180 * 24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+    const dateLastYear = new Date(Date.now() - (360 * 24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+
+    const dates = [dateToday, dateLastWeek, dateLastMonth, dateLast3Months, dateLast6Months, dateLastYear]
+
+    const stats = []
+    for (let i = 0 ; i < dates.length ; i++) {
+        const x = await Request.find({createdAt: {
+            "$gte": dates[i].toString(),
+            "$lt": dateTomorrow.toString()
+        },
+        "requestorInfo.course": deptCourse,
+        requestType: { $nin: requestTypeOfficeStaff 
+        }})
+
+        stats.push(x.length)
+    }
+
     res.status(200).json({
         success: true,
         requests,
@@ -216,40 +246,41 @@ exports.getDeptChairRequests = catchAsyncErrors(async (req, res, next) => {
         processing,
         approved,
         denied,
-        crossEnrollment
+        crossEnrollment,
+        stats
     })
 })
 
 // Get all requests cics staff side => /api/v1/cicsAdmin/requests
-exports.getAllRequests = catchAsyncErrors(async (req, res, next) => {
+exports.getAllRequests = catchAsyncErrors(async(req, res, next) => {
     const getRequests = new APIFeatures(Request.find()
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRecents = new APIFeatures(Request.find()
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
         .pagination(resPerPage)
 
     const getRequestsPending = new APIFeatures(Request.find({ requestStatus: 'Pending', isTrash: false })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsProcessing = new APIFeatures(Request.find({ requestStatus: 'Processing', isTrash: false })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsApproved = new APIFeatures(Request.find({ requestStatus: 'Approved', isTrash: false })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsDenied = new APIFeatures(Request.find({ requestStatus: 'Denied', isTrash: false })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
@@ -260,6 +291,26 @@ exports.getAllRequests = catchAsyncErrors(async (req, res, next) => {
     const approved = await getRequestsApproved.query;
     const denied = await getRequestsDenied.query;
 
+    const dateToday = new Date(Date.now()).setHours(0,0,0,0)
+    const dateTomorrow = new Date(Date.now() + (24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+    const dateLastWeek = new Date(Date.now() - (7 * 24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+    const dateLastMonth = new Date(Date.now() - (30 * 24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+    const dateLast3Months = new Date(Date.now() - (90 * 24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+    const dateLast6Months = new Date(Date.now() - (180 * 24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+    const dateLastYear = new Date(Date.now() - (360 * 24 * 60 * 60 * 1000)).setHours(0,0,0,0)
+
+    const dates = [dateToday, dateLastWeek, dateLastMonth, dateLast3Months, dateLast6Months, dateLastYear]
+
+    const stats = []
+    for (let i = 0 ; i < dates.length ; i++) {
+        const x = await Request.find({createdAt: {
+            "$gte": dates[i].toString(),
+            "$lt": dateTomorrow.toString()
+        }})
+
+        stats.push(x.length)
+    }
+
     res.status(200).json({
         success: true,
         requests,
@@ -267,34 +318,35 @@ exports.getAllRequests = catchAsyncErrors(async (req, res, next) => {
         pending,
         processing,
         approved,
-        denied
+        denied,
+        stats
     })
 })
 
 // Get requests that are handled by the office only => /api/v1/cicsAdmin/officeRequests
-exports.getOfficeRequests = catchAsyncErrors(async (req, res, next) => {
+exports.getOfficeRequests = catchAsyncErrors(async(req, res, next) => {
     const getRequests = new APIFeatures(Request.find({ isTrash: false, requestType: { $in: requestTypeOfficeStaff } })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsPending = new APIFeatures(Request.find({ requestStatus: 'Pending', isTrash: false, requestType: { $in: requestTypeOfficeStaff } })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsProcessing = new APIFeatures(Request.find({ requestStatus: 'Processing', isTrash: false, requestType: { $in: requestTypeOfficeStaff } })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsApproved = new APIFeatures(Request.find({ requestStatus: 'Approved', isTrash: false, requestType: { $in: requestTypeOfficeStaff } })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsDenied = new APIFeatures(Request.find({ requestStatus: 'Denied', isTrash: false, requestType: { $in: requestTypeOfficeStaff } })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
@@ -316,9 +368,9 @@ exports.getOfficeRequests = catchAsyncErrors(async (req, res, next) => {
 
 
 // Get unmanaged requests for cics staff => /api/v1/cicsStaff/available/requests
-exports.getAvailableRequests = catchAsyncErrors(async (req, res, next) => {
+exports.getAvailableRequests = catchAsyncErrors(async(req, res, next) => {
     const getRequests = new APIFeatures(Request.find({ isTrash: false, requestType: { $in: requestTypeOfficeStaff }, managedBy: '' })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
@@ -331,29 +383,29 @@ exports.getAvailableRequests = catchAsyncErrors(async (req, res, next) => {
 })
 
 // Get requests that are assigned and handled by the office only => /api/v1/cicsAdmin/assigned/requests
-exports.getAssignedRequests = catchAsyncErrors(async (req, res, next) => {
+exports.getAssignedRequests = catchAsyncErrors(async(req, res, next) => {
     const getRequests = new APIFeatures(Request.find({ isTrash: false, requestType: { $in: requestTypeOfficeStaff }, managedBy: req.user.id })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsPending = new APIFeatures(Request.find({ requestStatus: 'Pending', isTrash: false, requestType: { $in: requestTypeOfficeStaff }, managedBy: req.user.id })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsProcessing = new APIFeatures(Request.find({ requestStatus: 'Processing', isTrash: false, requestType: { $in: requestTypeOfficeStaff }, managedBy: req.user.id })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsApproved = new APIFeatures(Request.find({ requestStatus: 'Approved', isTrash: false, requestType: { $in: requestTypeOfficeStaff }, managedBy: req.user.id })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
     const getRequestsDenied = new APIFeatures(Request.find({ requestStatus: 'Denied', isTrash: false, requestType: { $in: requestTypeOfficeStaff }, managedBy: req.user.id })
-        .sort({ createdAt: -1 }), req.query)
+            .sort({ createdAt: -1 }), req.query)
         .searchRequests()
         .filter()
 
@@ -374,7 +426,7 @@ exports.getAssignedRequests = catchAsyncErrors(async (req, res, next) => {
 })
 
 // View trashed requests => /api/v1/deptChair/trash
-exports.getTrashedRequests = catchAsyncErrors(async (req, res, next) => {
+exports.getTrashedRequests = catchAsyncErrors(async(req, res, next) => {
     let deptCourse = ''
 
     switch (req.user.role) {
@@ -398,12 +450,12 @@ exports.getTrashedRequests = catchAsyncErrors(async (req, res, next) => {
 
     if (deptCourse === 'Office') {
         getRequests = new APIFeatures(Request.find({ isTrash: true, requestType: { $in: requestTypeOfficeStaff } })
-            .sort({ createdAt: -1 }), req.query)
+                .sort({ createdAt: -1 }), req.query)
             .searchRequests()
             .filter()
     } else {
         getRequests = new APIFeatures(Request.find({ "requestorInfo.course": deptCourse, isTrash: true, requestType: { $nin: requestTypeOfficeStaff } })
-            .sort({ createdAt: -1 }), req.query)
+                .sort({ createdAt: -1 }), req.query)
             .searchRequests()
             .filter()
     }
@@ -417,12 +469,12 @@ exports.getTrashedRequests = catchAsyncErrors(async (req, res, next) => {
 })
 
 // Update request   => /api/v1/admin/updateRequest/:requestId
-exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
+exports.updateRequest = catchAsyncErrors(async(req, res, next) => {
     let deptCourse = ''
     const rqst = await Request.findById(req.params.requestId)
-    /* removed the if condition for updating requests only within their department because the cross enrollment request
-     requires department chairs from other courses to also approve the switch case can be replaced into an if condition that the student
-     role cannot have access. */
+        /* removed the if condition for updating requests only within their department because the cross enrollment request
+         requires department chairs from other courses to also approve the switch case can be replaced into an if condition that the student
+         role cannot have access. */
     switch (req.user.role) {
         case 'IT Dept Chair':
             deptCourse = 'Information Technology'
@@ -460,6 +512,8 @@ exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
         returningFiles: req.files
     }
 
+    let withFiles = ` and ${req.files.length} file attachment(s)`
+
     if (req.files == null || req.files == '') {
         remarksData = {
             dateOfRemark: new Date(Date.now()),
@@ -467,18 +521,23 @@ exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
             userUpdated: req.user.firstName + ' ' + req.user.middleName + ' ' + req.user.lastName,
             remarksMessage
         }
+
+        withFiles = ``
     }
 
-    Request.findOneAndUpdate(
-        { _id: req.params.requestId },
-        { $push: { remarks: remarksData } },
-        { useFindAndModify: false }
-    ).exec()
+    Request.findOneAndUpdate({ _id: req.params.requestId }, { $push: { remarks: remarksData } }, { useFindAndModify: false }).exec()
 
-    const auditLog = await Audit.create({
-        userAudit: req.user.email,
-        requestAudit: request.trackingNumber,
-        actionAudit: `User account: (${req.user.email}) has updated the status of request with the tracking number: (${request.trackingNumber}) \n Current Status: ${req.body.requestStatus}`,
+    const userName = req.user.firstName + ' ' + req.user.lastName
+
+    let eventInfo = `Updated request with tracking number: ${request.trackingNumber} with status of ${req.body.requestStatus}${withFiles}`
+
+    if (remarksMessage) {
+        eventInfo = `Updated request with tracking number: ${request.trackingNumber} with status of ${req.body.requestStatus}${withFiles} with remarks of: ${remarksMessage}`
+    }
+    await Audit.create({
+        name: `Request update`,
+        eventInfo,
+        user: userName,
         dateAudit: Date.now()
     })
 
@@ -514,7 +573,7 @@ exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
 })
 
 // Assign a request to self => /api/v1/cicsStaff/assign/request/:requestId
-exports.assignRequestToSelfCICS = catchAsyncErrors(async (req, res, next) => {
+exports.assignRequestToSelfCICS = catchAsyncErrors(async(req, res, next) => {
     let request = await Request.findById(req.params.requestId);
 
     if (!request) { return next(new ErrorHandler(`Request does not exist with this id:(${req.params.requestId})`)) }
@@ -526,6 +585,16 @@ exports.assignRequestToSelfCICS = catchAsyncErrors(async (req, res, next) => {
         runValidators: true,
         useFindAndModify: false
     })
+
+    const userName = req.user.firstName + ' ' + req.user.lastName
+
+    await Audit.create({
+        name: "Request assignment",
+        eventInfo: `Request with tracking number: ${req.body.trackingNumber} was assigned to user ${req.user.id}`,
+        user: userName,
+        dateAudit: Date.now()
+    })
+
     res.status(200).json({
         success: true,
         message: `Request has been assigned to ${req.user.email}`
@@ -534,7 +603,7 @@ exports.assignRequestToSelfCICS = catchAsyncErrors(async (req, res, next) => {
 })
 
 // Move request to trash or trash to restore => /api/v1/admin/trashRequest/:requestId
-exports.trashRequest = catchAsyncErrors(async (req, res, next) => {
+exports.trashRequest = catchAsyncErrors(async(req, res, next) => {
     let request = await Request.findById(req.params.requestId);
 
     if (!request) { return next(new ErrorHandler(`Request does not exist with this id:(${req.params.requestId})`)) }
@@ -547,22 +616,24 @@ exports.trashRequest = catchAsyncErrors(async (req, res, next) => {
         useFindAndModify: false
     })
 
-    const auditRequest = await Request.findById(req.params.requestId);
-
-    let actionAudit, statusMessage
+    let actionAudit, statusMessage, eventName
 
     if (req.body.isTrash) {
-        actionAudit = `User account: (${req.user.email}) has moved the request to trash with the tracking number: (${auditRequest.trackingNumber})`
+        actionAudit = `Request with tracking number: ${request.trackingNumber} was moved to Trash.`
         statusMessage = "Request has been moved to trash"
+        eventName = `Trashed request`
     } else {
-        actionAudit = `User account: (${req.user.email}) has restored the request from trash with the tracking number: (${auditRequest.trackingNumber})`
+        actionAudit = `Request with tracking number: ${request.trackingNumber} was restored from Trash.`
         statusMessage = "Request has been restored from trash"
+        eventName = 'Restored request'
     }
 
-    const auditLog = await Audit.create({
-        userAudit: req.user.email,
-        requestAudit: auditRequest.trackingNumber,
-        actionAudit,
+    const userName = req.user.firstName + ' ' + req.user.lastName
+
+    await Audit.create({
+        name: eventName,
+        eventInfo: actionAudit,
+        user: userName,
         dateAudit: Date.now()
     })
 
@@ -573,7 +644,7 @@ exports.trashRequest = catchAsyncErrors(async (req, res, next) => {
 })
 
 // Delete request   => /api/v1/deleteRequest/:requestId
-exports.deleteRequest = catchAsyncErrors(async (req, res, next) => {
+exports.deleteRequest = catchAsyncErrors(async(req, res, next) => {
     const request = await Request.findById(req.params.requestId);
 
     if (!request) { return next(new ErrorHandler(`Request does not exist with this id:(${req.params.requestId})`)) }
@@ -592,7 +663,7 @@ exports.deleteRequest = catchAsyncErrors(async (req, res, next) => {
     for (let i = 0; i < remarksLength; i++) {
         if (remarksData[i].returningFiles.length != 0) {
             returningFilesArray.push(remarksData[i].returningFiles)
-        } 
+        }
     }
 
     const rfaArrayLength = []
@@ -600,12 +671,12 @@ exports.deleteRequest = catchAsyncErrors(async (req, res, next) => {
     for (let i = 0; i < returningFilesArray.length; i++) {
         rfaArrayLength.push(returningFilesArray[i].length)
     }
-    
+
     for (let i = 0; i < returningFilesArray.length; i++) {
         let fileReturned = returningFilesArray[i]
         for (let y = 0; y < fileReturned.length; y++) {
-               arrayIds.push(fileReturned[y].filename)
-            
+            arrayIds.push(fileReturned[y].filename)
+
         }
     }
 
@@ -615,15 +686,16 @@ exports.deleteRequest = catchAsyncErrors(async (req, res, next) => {
 
     if (arrayIds.length != 0) {
         for (let x = 0; x < arrayIds.length; x++) {
-            cloudinary.uploader.destroy(arrayIds[x],
-                { resource_type: 'raw' })
+            cloudinary.uploader.destroy(arrayIds[x], { resource_type: 'raw' })
         }
     }
 
-    const auditLog = await Audit.create({
-        userAudit: req.user.email,
-        requestAudit: request.trackingNumber,
-        actionAudit: `User account: (${req.user.email}) has deleted the request with the tracking number: (${request.trackingNumber})`,
+    const userName = req.user.firstName + ' ' + req.user.lastName
+
+    await Audit.create({
+        name: "Request permanent deletion",
+        eventInfo: `Permanently deleted request with tracking number: ${request.trackingNumber}.`,
+        user: userName,
         dateAudit: Date.now()
     })
 

@@ -7,7 +7,6 @@ import {
     TRACK_REQUEST_SUCCESS,
     TRACK_REQUEST_FAIL,
     TRACK_REQUEST_RESET,
-    SAVE_FORM_SUCCESS,
     SUBMIT_REQUEST_REQUEST,
     SUBMIT_REQUEST_SUCCESS,
     SUBMIT_REQUEST_FAIL,
@@ -159,7 +158,7 @@ export const submitRequestReducer = (state = { request: {} }, action) => {
 }
 
 //get ALL requests
-export const getRequestsReducer = (state = { requests: [], recents: [], pending: [], processing: [], approved: [], denied: [], crossEnrollment: [] }, action) => {
+export const getRequestsReducer = (state = { requests: [], recents: [], pending: [], processing: [], approved: [], denied: [], crossEnrollment: [], stats: [] }, action) => {
     switch (action.type) {
         case GET_REQUESTS_REQUEST:
             return {
@@ -184,6 +183,7 @@ export const getRequestsReducer = (state = { requests: [], recents: [], pending:
                 approved: action.payload.approved,
                 denied: action.payload.denied,
                 crossEnrollment: action.payload.crossEnrollment,
+                stats: action.payload.stats,
                 success: action.payload.success
             }
 

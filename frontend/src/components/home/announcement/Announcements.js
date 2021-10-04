@@ -2,14 +2,15 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
-import { Form, FormControl, Card, Row, Col, Container } from 'react-bootstrap'
+import { Form, FormControl, Card, Row, Col, Container, Button } from 'react-bootstrap'
+import { Markup } from 'interweave'
 import Pagination from 'react-js-pagination'
 import { getAnnouncements, getAnnouncementType, clearErrors } from './../../../actions/announcementActions'
 import MetaData from './../../layout/MetaData'
 import Loader from './../../layout/Loader'
 import { INSIDE_DASHBOARD_FALSE } from '../../../constants/dashboardConstants'
 import '../../../App.css'
-var dateFormat = require('dateformat')
+import dateformat from 'dateformat'
 
 const dropdown = {
     border: "2px solid black",
@@ -17,7 +18,7 @@ const dropdown = {
     margin: '5px 0'
 }
 
-const Announcements = () => {
+const Announcements = ({ history }) => {
     const alert = useAlert()
     const dispatch = useDispatch()
 
@@ -25,12 +26,7 @@ const Announcements = () => {
     const { loading: announcementTypeLoading, error: announcementTypeError, announcementTypes } = useSelector(state => state.announcementType)
 
     const [currentPage, setCurrentPage] = useState(1)
-
-    const tracks = ['Core Computer Science', 'Game Development', 'Data Science', 'Network and Security', 'Web and Mobile App Development', 'IT Automation', 'Business Analytics', 'Service Management']
-    const csTracks = ['Core Computer Science', 'Game Development', 'Data Science']
-    const itTracks = ['Network and Security', 'Web and Mobile App Development', 'IT Automation']
-    const isTracks = ['Business Analytics', 'Service Management']
-    
+    const [searchButton, setSearchButton] = useState(1)
     const [filter, setFilter] = useState({
         course: '',
         yearLevel: '',
@@ -41,19 +37,22 @@ const Announcements = () => {
 
     const { course, yearLevel, track, announcementType, title } = filter
 
+    const tracks = ['Core Computer Science', 'Game Development', 'Data Science', 'Network and Security', 'Web and Mobile App Development', 'IT Automation', 'Business Analytics', 'Service Management']
+    const csTracks = ['Core Computer Science', 'Game Development', 'Data Science']
+    const itTracks = ['Network and Security', 'Web and Mobile App Development', 'IT Automation']
+    const isTracks = ['Business Analytics', 'Service Management']
+    
     let count = announcementCount
 
     if (filter.course !== '' || filter.yearLevel !== '' || filter.track !== '' || filter.announcementType !== '' || filter.title !== '') {
         count = filteredAnnouncementsCount
     }
     
-    const changeDateFormat = date => dateFormat(date, "dddd mmm d, yyyy h:MMtt")
+    const changeDateFormat = date => dateformat(date, "dddd mmm d, yyyy h:MMtt")
 
-    function setCurrentPageNo(pageNumber) {
-        setCurrentPage(pageNumber)
-    }
+    const setCurrentPageNo = (pageNumber) => { setCurrentPage(pageNumber) }
 
-    function shortenDescription(description) {
+    const shortenDescription = (description) => {
         let y = description.split(' ')
         let z = description.split(' ').slice(0, 50).join(' ')
 
@@ -70,8 +69,10 @@ const Announcements = () => {
         if (announcementTypeError) {
             alert.error(announcementTypeError)
             dispatch(clearErrors())
+
+            history.push('/error')
         }
-    }, [dispatch, alert, announcementTypeError])
+    }, [dispatch, history, alert, announcementTypeError])
 
     useEffect(() => {
         dispatch(getAnnouncements(currentPage, course, yearLevel, track, title, announcementType))
@@ -79,12 +80,34 @@ const Announcements = () => {
         if (error) {
             alert.error(error)
             dispatch(clearErrors())
+
+            history.push('/error')
         }
 
         dispatch({
             type: INSIDE_DASHBOARD_FALSE
         })
-    }, [dispatch, alert, error, currentPage, course, yearLevel, track, title, announcementType])
+    }, [dispatch, history, alert, error, currentPage])
+
+    useEffect(() => {
+        dispatch(getAnnouncements(currentPage, course, yearLevel, track, title, announcementType))
+
+        if (error) {
+            alert.error(error)
+            dispatch(clearErrors())
+
+            setFilter({
+                course: '',
+                yearLevel: '',
+                track: '',
+                announcementType: '',
+                title: ''
+            })
+            
+            history.push('/error')
+        }
+
+    }, [dispatch, history, alert, error, searchButton])
 
     const onChange = e => {
         setCurrentPageNo(1)
@@ -114,6 +137,12 @@ const Announcements = () => {
         }
     }
 
+    const searchHandler = e => {
+        e.preventDefault()
+
+        setSearchButton(searchButton+1)
+    }
+
     return (
         <Fragment>
             <MetaData title={`Announcements`} />
@@ -122,7 +151,7 @@ const Announcements = () => {
                     <h3>ANNOUNCEMENTS</h3>
                 </div>
                 <Container className="space"></Container>
-                <Form >
+                <Form onSubmit={searchHandler}>
                     <Row >
                         <Col xs={12} md={4} lg={2}>
                             <Form.Group>
@@ -159,7 +188,7 @@ const Announcements = () => {
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col xs={12} md={4} lg={3}>
+                        <Col xs={12} md={4} lg={2}>
                             <Form.Group>
                                 <Form.Select
                                     aria-label="tracks"
@@ -203,7 +232,7 @@ const Announcements = () => {
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col xs={12} md={6} lg={3}>
+                        <Col xs={12} md={4} lg={2}>
                             <Form.Group>
                                 <Form.Select
                                     aria-label="AnnouncementType"
@@ -220,7 +249,7 @@ const Announcements = () => {
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col xs={12} md={6} lg={2}>
+                        <Col xs={12} md={4} lg={2}>
                             <Form.Group sm>
                                 <FormControl
                                     type="search"
@@ -237,6 +266,26 @@ const Announcements = () => {
                                 />
                             </Form.Group>
                         </Col>
+                        <Col xs={12} md={4} lg={2}>
+                            <Form.Group sm>
+                                <center>
+                                    <Button type='submit' style={{margin: '5px'}}>Submit</Button>
+                                    <Button
+                                        type='submit'
+                                        onClick={() => {
+                                            setFilter({
+                                                course: '',
+                                                yearLevel: '',
+                                                track: '',
+                                                announcementType: '',
+                                                title: ''
+                                            })
+                                        }}
+                                        style={{margin: '5px'}}
+                                    >Reset</Button>
+                                </center>
+                            </Form.Group>
+                        </Col>
                     </Row>
                 </Form>
             </Container>
@@ -250,15 +299,20 @@ const Announcements = () => {
                                 <Card.Body>
                                     <Card.Header style={{ background: '#F5F5F5', fontWeight: '600' }}>{announcement.title}</Card.Header>
                                     <Card.Text style={{ marginLeft: '15px' }}>
-                                        <span style={{ fontWeight: '500', color: 'gray', fontSize: '12px' }}>{changeDateFormat(announcement.createdAt)}</span>
+                                        <span style={{ fontWeight: '300', color: 'gray', fontSize: '12px' }}>{changeDateFormat(announcement.createdAt)}</span>
                                         <br />
-                                        <span style={{ fontSize: '14px' }}>{shortenDescription(announcement.description)}</span>
+                                        <span style={{ fontWeight: '500', fontSize: '14px' }}><Markup content={shortenDescription(announcement.description)}/> <Link to={`/announcement/${announcement._id}`}>Read More &#xbb;</Link></span>
                                         <br /><br />
-                                        <span style={{ fontSize: '12px' }}><Link to={`/announcement/${announcement._id}`}>Read More &#xbb;</Link></span>
+                                        <span style={{ fontSize: '12px', color: 'gray' }}>Attachments: {announcement.fileAttachments.length} file(s)</span>
+                                    </Card.Text>
+                                    <Card.Text style={{ fontSize: '10px', color: 'gray', marginLeft: '15px' }}>
+                                        <span>Year Level: {announcement.yearLevel}</span>
                                         <br />
-                                        <span style={{ fontSize: '12px' }}>Attachments: {announcement.fileAttachments.length} file(s)</span>
+                                        <span>Course: {announcement.course}</span>
                                         <br />
-                                        <span style={{ fontWeight: '300', color: 'gray', fontSize: '12px' }}>Tags: {announcement.yearLevel}, {announcement.course}, {announcement.track}, {announcement.announcementType}</span>
+                                        <span>Track: {announcement.track}</span>
+                                        <br />
+                                        <span>Announcement Type: {announcement.announcementType}</span>
                                     </Card.Text>
                                 </Card.Body>
                             </Card>

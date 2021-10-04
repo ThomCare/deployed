@@ -4,19 +4,31 @@ import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import { Container, Button } from 'react-bootstrap'
 import { MDBDataTableV5 } from 'mdbreact'
+import { Markup } from 'interweave'
 import { getAdminAnnouncements, clearErrors } from '../../../actions/announcementActions'
 import { INSIDE_DASHBOARD_TRUE } from '../../../constants/dashboardConstants'
 import Sidebar from '../../layout/Sidebar'
 import MetaData from '../../layout/MetaData'
 import Loader from '../../layout/Loader'
-var dateFormat = require('dateformat')
+import dateformat from 'dateformat'
 
-const ListAnnouncements = () => {
+const ListAnnouncements = ({ history }) => {
     const alert = useAlert()
     const dispatch = useDispatch()
 
     const { loading, announcements, error } = useSelector(state => state.announcements)
-    const changeDateFormat = date => dateFormat(date, "mmm d, yyyy h:MMtt")
+    const changeDateFormat = date => dateformat(date, "mmm d, yyyy h:MMtt")
+
+    const shortenDescription = (description) => {
+        let y = description.split(' ')
+        let z = description.split(' ').slice(0, 50).join(' ')
+
+        if (y.length > 50) {
+            z = z + '...'
+        }
+
+        return z
+    }
 
     useEffect(() => {
         dispatch(getAdminAnnouncements('Not me'))
@@ -24,12 +36,14 @@ const ListAnnouncements = () => {
         if (error) {
             alert.error(error)
             dispatch(clearErrors())
+
+            history.push('/error')
         }
 
         dispatch({
             type: INSIDE_DASHBOARD_TRUE
         })
-    }, [dispatch, alert, error])
+    }, [dispatch, history, alert, error])
 
     const setAnnouncements = () => {
         const data = {
@@ -62,7 +76,7 @@ const ListAnnouncements = () => {
             data.rows.push({
                 date: changeDateFormat(announcement.createdAt),
                 title: announcement.title,
-                description: announcement.description,
+                description: <Fragment><Markup content={shortenDescription(announcement.description)}/></Fragment>,
                 tags: <Fragment>
                     <span>
                         <p style={{ margin: '0' }}><b>Year Level: </b>{announcement.yearLevel}</p>

@@ -2,7 +2,7 @@ import React, { Fragment } from 'react'
 import { Route, Redirect } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
-const ProtectedRoute = ({ component: Component, ...rest }) => {
+const ProtectedRoute = ({ forAdmins, forCICS, forDeptChairs, component: Component, ...rest }) => {
     const { isAuthenticated, loading, user } = useSelector(state => state.auth)
 
     return (
@@ -16,17 +16,17 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
                             return <Redirect to='/login' />
                         }
 
-                        // if(forAdmins === true && (user.role !== 'admin' && user.role !== 'superadmin')) {
-                        //     return <Redirect to='/' />
-                        // }
+                        if (forAdmins === true && user.role === 'Student') {
+                            return <Redirect to='/controlpanel'/>
+                        }
 
-                        // if(isAdmin === true && user.role !== 'admin') {
-                        //     return <Redirect to='/admin/dashboard' />
-                        // }
+                        if (forCICS === true && user.role !== 'CICS Staff') {
+                            return <Redirect to='/controlpanel'/>
+                        }
 
-                        // if(isSuperAdmin === true && (user.role === 'admin' && user.role !== 'superadmin')) {
-                        //     return <Redirect to='/admin/dashboard' />
-                        // }
+                        if (forDeptChairs === true && (user.role === 'CICS Staff' || user.role === 'Student')) {
+                            return <Redirect to='/controlpanel'/>
+                        }
 
                         return <Component {...props} />
                     }}

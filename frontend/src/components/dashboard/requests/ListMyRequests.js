@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
-import { Container, Button } from 'react-bootstrap'
+import { Container, Button, ButtonGroup, ButtonToolbar } from 'react-bootstrap'
 import { MDBDataTableV5 } from 'mdbreact'
 import { getRequests, updateRequest, clearErrors } from '../../../actions/requestActions'
 import { UPDATE_REQUEST_RESET } from '../../../constants/requestConstants'
@@ -10,7 +10,7 @@ import { INSIDE_DASHBOARD_TRUE } from '../../../constants/dashboardConstants'
 import Sidebar from '../../layout/Sidebar'
 import MetaData from '../../layout/MetaData'
 import Loader from '../../layout/Loader'
-var dateFormat = require('dateformat')
+import dateformat from 'dateformat'
 
 const ListMyRequests = ({ history }) => {
     const alert = useAlert()
@@ -22,7 +22,7 @@ const ListMyRequests = ({ history }) => {
     const [requestList, setRequestList] = useState([])
     const [status, setStatus] = useState('Requests')
 
-    const changeDateFormat = (date) => dateFormat(date, "mmm d, yyyy h:MMtt")
+    const changeDateFormat = (date) => dateformat(date, "mmm d, yyyy h:MMtt")
     const upperCase = (text) => text.toUpperCase()
     
     useEffect(() => {
@@ -56,6 +56,8 @@ const ListMyRequests = ({ history }) => {
         if (error) {
             alert.error(error)
             dispatch(clearErrors())
+
+            history.push('/error')
         }
 
         if (updateError) {
@@ -139,7 +141,7 @@ const ListMyRequests = ({ history }) => {
                     </Link>
                     <Link to={`/admin/request/${request._id}`}>
                         <Button variant="warning" className="mr-5" style={{ margin: '5px' }}>
-                            <i class="fa fa-pencil" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
+                            <i class="fa fa-edit" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
                         </Button>
                     </Link>
                     <Button variant="danger" className="mr-5" style={{ margin: '5px' }} onClick={() => {
@@ -165,11 +167,15 @@ const ListMyRequests = ({ history }) => {
                     <Container>
                         <h3>My Requests {`/ ${status}`}</h3>
                         
-                        <Button style={{margin: '10px'}} onClick={() => setStatus('Requests')}>View All</Button>
-                        <Button style={{margin: '10px'}} onClick={() => setStatus('Pending')}>Pending</Button>
-                        <Button style={{margin: '10px'}} onClick={() => setStatus('Processing')}>Processing</Button>
-                        <Button style={{margin: '10px'}} onClick={() => setStatus('Approved')}>Approved</Button>
-                        <Button style={{margin: '10px'}} onClick={() => setStatus('Denied')}>Denied</Button>
+                        <ButtonToolbar>
+                            <ButtonGroup className="me-2">
+                                <Button onClick={() => setStatus('Requests')}>View All</Button>
+                                <Button onClick={() => setStatus('Pending')}>Pending</Button>
+                                <Button onClick={() => setStatus('Processing')}>Processing</Button>
+                                <Button onClick={() => setStatus('Approved')}>Approved</Button>
+                                <Button onClick={() => setStatus('Denied')}>Denied</Button>
+                            </ButtonGroup>
+                        </ButtonToolbar>
 
                         {loading ? <Loader /> : (
                             <>

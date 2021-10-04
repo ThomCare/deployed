@@ -31,6 +31,8 @@ const ListUsers = ({ history }) => {
         if (error) {
             alert.error(error)
             dispatch(clearErrors())
+
+            history.push('/error')
         }
 
         if (deleteError) {
@@ -103,7 +105,7 @@ const ListUsers = ({ history }) => {
                         <span>
                             <Link to={`/profile`}>
                                 <Button variant="primary" className="mr-5" style={{ margin: '5px' }}>
-                                    <i class="fa fa-pencil" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
+                                    <i class="fa fa-edit" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
                                 </Button>
                             </Link>
                         </span>
@@ -111,7 +113,7 @@ const ListUsers = ({ history }) => {
                         <span>
                             <Link to={`/admin/user/${user._id}`}>
                                 <Button variant="primary" className="mr-5" style={{ margin: '5px' }}>
-                                    <i class="fa fa-pencil" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
+                                    <i class="fa fa-edit" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
                                 </Button>
                             </Link>
                         </span>

@@ -18,6 +18,7 @@ const SubmitRequest = () => {
     const dispatch = useDispatch()
 
     const { loading, success, error, request } = useSelector(state => state.submitRequest)
+    const { user } = useSelector(state => state.auth)
 
     const [fileRequirements, setFileRequirements] = useState([])
     const [section, setSection] = useState()
@@ -38,10 +39,18 @@ const SubmitRequest = () => {
         'Request for Manual Enrollment',
         'Request for Course Description',
         'Request for Certificate of Grades',
+        'Request for Leave of Absence',
+        'Submission of Admission Memo',
         'Others'
     ]
 
+    let alphabet = []
+
     const upperCase = (text) => text.toUpperCase()
+
+    for (let i = 0; i < 26; i++) {
+        alphabet.push(upperCase((i+10).toString(36)))
+    }
 
     const reset = () => {
         dispatch({
@@ -126,16 +135,19 @@ const SubmitRequest = () => {
                                         <Col xs={12} sm={12} md={6}>
                                             <Form.Group className="mb-3">
                                                 <Form.Label>Section: </Form.Label>
-                                                <Form.Control
-                                                    type='text'
-                                                    placeholder="Section"
+                                                <Form.Select
+                                                    aria-label="Default select example"
                                                     name='section'
                                                     value={section}
-                                                    onChange={e => setSection(upperCase(e.target.value))}
-                                                    pattern="([A-Za-z]){1}"
-                                                    maxlength="1"
+                                                    onChange={e => setSection(e.target.value)}
                                                     required
-                                                />
+                                                >
+                                                    <option value=''>-</option>
+                                                    <option value='Alumni'>Alumni</option>
+                                                    {alphabet.map(letter => (
+                                                        <option value={letter}>{letter}</option>
+                                                    ))}
+                                                </Form.Select>
                                             </Form.Group>
                                         </Col>
                                     </Row>
@@ -198,7 +210,7 @@ const SubmitRequest = () => {
                                         <Button
                                             type='submit'
                                             style={{ marginTop: '10px', borderRadius: '50px', width: '10rem' }}
-                                            disabled={loading ? true : false}
+                                            disabled={loading || user.role !== 'Student' ? true : false}
                                         >
                                             {loading ? (
                                                 <span>

@@ -8,15 +8,15 @@ import { INSIDE_DASHBOARD_TRUE } from '../../../constants/dashboardConstants'
 import Sidebar from '../../layout/Sidebar'
 import MetaData from '../../layout/MetaData'
 import Loader from '../../layout/Loader'
-var dateFormat = require('dateformat')
+import dateformat from 'dateformat'
 
-const ListAllRequests = () => {
+const ListAllRequests = ({ history }) => {
     const alert = useAlert()
     const dispatch = useDispatch()
 
     const { loading, audits, error } = useSelector(state => state.audits)
 
-    const changeDateFormat = (date) => dateFormat(date, "ddd, mmm d, yyyy h:MMtt")
+    const changeDateFormat = (date) => dateformat(date, "yyyy-mm-dd h:MMtt")
 
     useEffect(() => {
         dispatch(getAuditLog())
@@ -24,12 +24,14 @@ const ListAllRequests = () => {
         if (error) {
             alert.error(error)
             dispatch(clearErrors())
+
+            history.push('/error')
         }
 
         dispatch({
             type: INSIDE_DASHBOARD_TRUE
         })
-    }, [dispatch, alert, error])
+    }, [dispatch, history, alert, error])
 
     const setAudits = () => {
         const data = {
@@ -37,22 +39,22 @@ const ListAllRequests = () => {
                 {
                     label: 'Date',
                     field: 'dateAudit',
-                    width: 100
-                },
-                {
-                    label: 'User Audit',
-                    field: 'userAudit',
                     width: 150
                 },
                 {
-                    label: 'Request Audit',
-                    field: 'requestAudit',
+                    label: 'Event Name',
+                    field: 'name',
+                    width: 150
+                },
+                {
+                    label: 'Event Info',
+                    field: 'eventInfo',
                     width: 300
                 },
                 {
-                    label: 'Action Audit',
-                    field: 'actionAudit',
-                    width: 180
+                    label: 'User',
+                    field: 'user',
+                    width: 150
                 }
             ],
             rows: []
@@ -61,9 +63,9 @@ const ListAllRequests = () => {
         audits.forEach(audit => {
             data.rows.push({
                 dateAudit: changeDateFormat(audit.dateAudit),
-                userAudit: audit.userAudit,
-                requestAudit: audit.requestAudit,
-                actionAudit: audit.actionAudit
+                eventInfo: audit.eventInfo,
+                user: audit.user,
+                name: audit.name
             })
         })
 

@@ -94,7 +94,7 @@ const RegisterAdmin = ({ history }) => {
                                                 <Col md={3} style={{ marginTop: '5px' }}>
                                                     <Form.Control
                                                         type="text"
-                                                        placeholder="Middle Name (Optional)"
+                                                        placeholder="(Optional) Middle Name"
                                                         value={middleName}
                                                         onChange={e => setMiddleName(upperCase(e.target.value))}
                                                         pattern="([A-zÀ-ž\s]){2,}"
@@ -138,7 +138,7 @@ const RegisterAdmin = ({ history }) => {
                                                     <Form.Control
                                                         type="email"
                                                         placeholder="juan.delacruz.iics@ust.edu.ph"
-                                                        pattern="[a-z]{1,}\.[a-z]{1,}@ust\.edu\.ph"
+                                                        pattern="[a-z.]{1,}@ust\.edu\.ph"
                                                         value={email}
                                                         name="email"
                                                         onChange={e => setEmail(e.target.value)}

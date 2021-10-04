@@ -2,8 +2,9 @@ import React, { Fragment, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Pdf from "react-to-pdf";
 import { INSIDE_DASHBOARD_FALSE } from '../../../../constants/dashboardConstants'
-import { Button } from 'react-bootstrap'
+import { Button, Row } from 'react-bootstrap'
 import './css/form6a.css'
+import '../../../../App.css'
 
 const ref = React.createRef();
 
@@ -44,14 +45,15 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
 
     return (
         <>
+        <div style={{fontFamily: 'MuktaMalar' }}>
             <span style={{ margin: '10px' }}>
                 <h4>Preview of accomplished form.</h4>
                 <h6>Click 'Save as PDF' button below to download the form.</h6>
             </span>
             <div className="Post" ref={ref} style={{ border: '1px solid black ' }}>
                 <div className="headerform">
-                    <div>
-                        UST FORM No. 6A<br />
+                    <div style={{fontSize: '10px'}}>
+                        UST Form No. 6A<br />
                         <span style={{ fontWeight: 'bold' }}>CHANGE / DROP COURSE </span>
                     </div>
                     <div>
@@ -69,11 +71,11 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                         </table>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                        <span style={{ fontWeight: 'bold' }}>UNIVERSITY OF SANTO TOMAS</span><br />
+                        <span style={{ fontWeight: 'bold', fontSize: '18px', fontFamily: 'AveriaBold'}}>UNIVERSITY OF SANTO TOMAS</span><br />
                         España St., Manila, Philippines
                     </div>
                     <div>
-                        <img src="/images/UST_SEAL.png" alt="UST LOGO" width="60" height="60" />
+                        <img src="/images/UST_SEAL.png" alt="UST LOGO" width="80" height="80" />
                     </div>
                 </div>
 
@@ -104,8 +106,8 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                 </div>
 
                 <div className="namesbelow" style={{ fontWeight: 'bold' }}>
-                    <div>LAST</div>
-                    <div>FIRST</div>
+                    <div>LAST NAME</div>
+                    <div>FIRST NAME</div>
                     <div>M.I.</div>
                     <div style={{ textAlign: 'right' }}>COLLEGE/PROGRAM</div>
                 </div>
@@ -120,7 +122,7 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                                         <td colSpan={15} style={{ textAlign: 'center' }}>C O U R S E S</td>
                                         <td>Units</td>
                                         <td>Days</td>
-                                        <td>Time</td>
+                                        <td style={{width: '120px'}}>Time</td>
                                         <td>Room</td>
                                         <td>Section</td>
                                     </tr>
@@ -158,7 +160,7 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                                                             <td colSpan={15}>{x.courseCode} - {x.courseName}</td>
                                                             <td>{Number(x.lecUnits) + Number(x.labUnits)}</td>{/** units*/}
                                                             <td>{x.days}</td>{/** days */}
-                                                            <td>{x.time}</td>{/** time*/}
+                                                            <td style={{width: '120px'}}  >{x.startTime} - {x.endTime}</td>{/** time*/}
                                                             <td>{x.room}</td>{/** room*/}
                                                             <td>{x.section}</td>{/** section*/}
                                                         </tr>
@@ -180,10 +182,10 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                             <table style={{ width: '95%' }}>
                                 <tbody>
                                     <tr style={{ fontWeight: 'bold' }}>
-                                        <td colSpan={15} style={{ textAlign: 'center' }}>C O U R S E S</td>
+                                        <td colSpan={15} style={{ textAlign: 'center', marginRight:'170px' }}>C O U R S E S</td>
                                         <td>Units</td>
-                                        <td>Days</td>
-                                        <td>Time</td>
+                                        <td >Days</td>
+                                        <td  style={{width: '120px'}}>Time</td>
                                         <td>Room</td>
                                         <td>Section</td>
                                     </tr>
@@ -218,12 +220,12 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                                                 toAdd.map(x => (
                                                     <Fragment>
                                                         <tr>
-                                                            <td colSpan={15}>{x.courseCode} - {x.courseName}</td>
-                                                            <td>{Number(x.lecUnits) + Number(x.labUnits)}</td>{/** units*/}
-                                                            <td>{x.days}</td>{/** days */}
-                                                            <td>{x.time}</td>{/** time*/}
-                                                            <td>{x.room}</td>{/** room*/}
-                                                            <td>{x.section}</td>{/** section*/}
+                                                            <td colSpan={15} style={{marginRight:'100px'}}>{x.courseCode} - {x.courseName}</td>
+                                                            <td >{Number(x.lecUnits) + Number(x.labUnits)}</td>{/** units*/}
+                                                            <td >{x.days}</td>{/** days */}
+                                                            <td style={{width: '120px'}}  >{x.startTime} - {x.endTime}</td>{/** time*/}
+                                                            <td >{x.room}</td>{/** room*/}
+                                                            <td >{x.section}</td>{/** section*/}
                                                         </tr>
                                                     </Fragment>
                                                 ))
@@ -239,12 +241,20 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                 <center>NEW TOTAL UNITS: {newTotalUnits}</center>
 
                 <div className="signatories" style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                <Row>
+                    <div>____________________________</div>
+                    <div></div>
                     <div>Dean or Representative</div>
+                    </Row>
+                    <div></div>
+                    <Row>
+                    <div>____________________________</div>
                     <div></div>
                     <div>Student's Signature</div>
+                    </Row>
                 </div>
 
-                <div style={{ textAlign: 'right', fontWeight: 'bold' }}>
+                <div style={{ textAlign: 'right', fontWeight: 'bold', }}>
                     UST:S033-00-FO-04
                 </div>
                 <center>
@@ -254,9 +264,9 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                 </center>
 
                 <div className="headerform">
-                    <div>
-                        UST FORM No. 6A<br />
-                        <span style={{ fontWeight: 'bold' }}>CHANGE /DROP COURSE </span>
+                <div style={{fontSize: '10px'}}>
+                        UST Form No. 6A<br />
+                        <span style={{ fontWeight: 'bold' }}>CHANGE / DROP COURSE </span>
                     </div>
                     <div>
                         <table>
@@ -273,9 +283,8 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                         </table>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                        <span style={{ fontWeight: 'bold' }}>UNIVERSITY OF SANTO TOMAS</span><br />
+                        <span style={{ fontWeight: 'bold', fontSize: '18px', fontFamily: 'AveriaBold'}}>UNIVERSITY OF SANTO TOMAS</span><br />
                         España St., Manila, Philippines
-
                     </div>
                     <div>
                         <img src="/images/UST_SEAL.png" alt="UST LOGO" width="60" height="60" />
@@ -310,8 +319,8 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                 </div>
 
                 <div className="namesbelow" style={{ fontWeight: 'bold' }}>
-                    <div>LAST</div>
-                    <div>FIRST</div>
+                    <div>LAST NAME</div>
+                    <div>FIRST NAME</div>
                     <div>M.I.</div>
                     <div style={{ textAlign: 'right' }}>COLLEGE/PROGRAM</div>
                 </div>
@@ -328,7 +337,7 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                                         <td colSpan={15} style={{ textAlign: 'center' }}>C O U R S E S</td>
                                         <td>Units</td>
                                         <td>Days</td>
-                                        <td>Time</td>
+                                        <td style={{width: '120px'}}>Time</td>
                                         <td>Room</td>
                                         <td>Section</td>
                                     </tr>
@@ -366,7 +375,7 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                                                             <td colSpan={15}>{x.courseCode} - {x.courseName}</td>
                                                             <td>{Number(x.lecUnits) + Number(x.labUnits)}</td>{/** units*/}
                                                             <td>{x.days}</td>{/** days */}
-                                                            <td>{x.time}</td>{/** time*/}
+                                                            <td style={{width: '120px'}}  >{x.startTime} - {x.endTime}</td>{/** time*/}
                                                             <td>{x.room}</td>{/** room*/}
                                                             <td>{x.section}</td>{/** section*/}
                                                         </tr>
@@ -392,7 +401,7 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                                         <td colSpan={15} style={{ textAlign: 'center' }}>C O U R S E S</td>
                                         <td>Units</td>
                                         <td>Days</td>
-                                        <td>Time</td>
+                                        <td style={{width: '120px'}}>Time</td>
                                         <td>Room</td>
                                         <td>Section</td>
                                     </tr>
@@ -430,7 +439,7 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                                                             <td colSpan={15}>{x.courseCode} - {x.courseName}</td>
                                                             <td>{Number(x.lecUnits) + Number(x.labUnits)}</td>{/** units*/}
                                                             <td>{x.days}</td>{/** days */}
-                                                            <td>{x.time}</td>{/** time*/}
+                                                            <td style={{width: '120px'}}  >{x.startTime} - {x.endTime}</td>{/** time*/}
                                                             <td>{x.room}</td>{/** room*/}
                                                             <td>{x.section}</td>{/** section*/}
                                                         </tr>
@@ -448,12 +457,20 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                 <center>NEW TOTAL UNITS: {newTotalUnits}</center>
 
                 <div className="signatories" style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                    <Row>
+                    <div>____________________________</div>
+                    <div></div>
                     <div>Dean or Representative</div>
+                    </Row>
+                    <div></div>
+                    <Row>
+                    <div>____________________________</div>
                     <div></div>
                     <div>Student's Signature</div>
+                    </Row>
                 </div>
 
-                <div style={{ textAlign: 'right', fontWeight: 'bold' }}>
+                <div style={{ textAlign: 'right', fontWeight: 'bold', fontStyle: 'italic' }}>
                     UST:S033-00-FO-04
                 </div>
                 <center>
@@ -471,6 +488,7 @@ const FORM6APDF = ({ studentInfo, submitted, setSubmitted }) => {
                     </center>
                 }
             </Pdf>
+            </div>
         </>
     );
 }

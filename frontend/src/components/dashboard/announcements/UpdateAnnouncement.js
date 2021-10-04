@@ -1,14 +1,17 @@
 import React, { Fragment, useState, useEffect } from 'react'
 import { useAlert } from 'react-alert'
+import ReactQuill from 'react-quill'
 import { useDispatch, useSelector } from 'react-redux'
 import { Form, Button, Card, Container, Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap'
 import { getAnnouncementDetails, getAnnouncementType, createAnnouncementType, updateAnnouncement, clearErrors } from '../../../actions/announcementActions'
 import { ANNOUNCEMENT_DETAILS_RESET, NEW_ANNOUNCEMENT_TYPE_RESET, UPDATE_ANNOUNCEMENT_RESET } from '../../../constants/announcementConstants'
 import { INSIDE_DASHBOARD_TRUE } from '../../../constants/dashboardConstants'
+import { modules, formats } from '../../../quill-templates/template'
 import Sidebar from '../../layout/Sidebar'
 import MetaData from '../../layout/MetaData'
 import Loader from '../../layout/Loader'
-var dateFormat = require('dateformat')
+import 'react-quill/dist/quill.snow.css'
+import dateformat from 'dateformat'
 
 const UpdateAnnouncement = ({ history, match }) => {
     const dispatch = useDispatch()
@@ -18,7 +21,7 @@ const UpdateAnnouncement = ({ history, match }) => {
     const { loading, error: updateError, isUpdated } = useSelector(state => state.announcement)
     const { loading: announcementTypeLoading, announcementTypes, error: announcementTypeError } = useSelector(state => state.announcementType)
 
-    const changeDateFormat = (date) => dateFormat(date, "yyyy-mm-dd")
+    const changeDateFormat = (date) => dateformat(date, "yyyy-mm-dd")
 
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
@@ -47,8 +50,10 @@ const UpdateAnnouncement = ({ history, match }) => {
         if (announcementTypeError) {
             alert.error(announcementTypeError)
             dispatch(clearErrors())
+            
+            history.push('/error')
         }
-    }, [dispatch, alert, announcementTypeError])
+    }, [dispatch, history, alert, announcementTypeError])
 
     useEffect(() => {
         if (announcement && announcement._id !== announcementId) {
@@ -70,6 +75,8 @@ const UpdateAnnouncement = ({ history, match }) => {
         if (error) {
             alert.error(error)
             dispatch(clearErrors())
+            
+            history.push('/error')
         }
 
         if (updateError) {
@@ -99,7 +106,6 @@ const UpdateAnnouncement = ({ history, match }) => {
     }, [dispatch, error, alert, isUpdated, updateError, announcement, announcementId, history])
 
     useEffect(() => {
-
         if (!setExpiry && ctr > 0) {
             setArchiveDate(changeDateFormat(Date.now()))
         }
@@ -177,12 +183,14 @@ const UpdateAnnouncement = ({ history, match }) => {
                                             </Form.Group>
                                             <Form.Group className="mb-3">
                                                 <Form.Label>Description</Form.Label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    rows={10}
+                                            
+                                                <ReactQuill 
+                                                    placeholder="Write something..."
                                                     name="description"
                                                     value={description}
-                                                    onChange={e => setDescription(e.target.value)}
+                                                    onChange={e => setDescription(e)}
+                                                    modules={modules}
+                                                    format={formats}
                                                     required
                                                 />
                                             </Form.Group>

@@ -51,31 +51,33 @@ const ForgotPassword = ({ history }) => {
                     <Card style={{ width: '30rem', align: 'center' }}>
                         <Card.Body>
                             <Card.Title style={{ margin: '50px 0 20px 0' }}>Forgot Password?</Card.Title>
-                            <Card.Text style={{ fontSize: '12px' }}>Enter your registered UST G Suite email address. A reset password link will be sent to your inbox.</Card.Text>
+                            <Card.Text style={{ fontSize: '12px' }}>Enter your registered UST GSuite email address. A reset password link will be sent to your inbox.</Card.Text>
                             <Form onSubmit={submitHandler} encType='application/json' method='post'>
                                 <FloatingLabel label="Email address" className="mb-3">
                                     <Form.Control
                                         type='email'
                                         placeholder="juan.delacruz.iics@ust.edu.ph"
-                                        pattern="[a-z]{1,}\.[a-z]{1,}\.(iics|cics)@ust\.edu\.ph"
+                                        pattern="[a-z.]{1,}@ust\.edu\.ph"
                                         name="email"
                                         value={email}
                                         onChange={e => setEmail(e.target.value)}
                                         required
                                     />
                                 </FloatingLabel>
-                                <Button
-                                    type='submit'
-                                    style={{ marginTop: '10px', borderRadius: '50px', width: '10rem' }}
-                                    disabled={loading ? true : false}>
-                                    {loading ? (
-                                        <span>
-                                            <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw" style={{ textAlign: 'center' }}></i>
-                                        </span>
-                                    ) : (
-                                        <span>Send Email</span>
-                                    )}
-                                </Button>
+                                <center>
+                                    <Button
+                                        type='submit'
+                                        style={{ marginTop: '10px', borderRadius: '50px', width: '10rem' }}
+                                        disabled={loading ? true : false}>
+                                        {loading ? (
+                                            <span>
+                                                <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw" style={{ textAlign: 'center' }}></i>
+                                            </span>
+                                        ) : (
+                                            <span>Send Email</span>
+                                        )}
+                                    </Button>
+                                </center>
                             </Form>
                         </Card.Body>
                     </Card>

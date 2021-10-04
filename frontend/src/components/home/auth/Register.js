@@ -1,15 +1,14 @@
 import React, { Fragment, useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Form, Button, Card, Container, Row, Col } from 'react-bootstrap'
-import { saveStudentInfo } from '../../../actions/userActions'
 import { INSIDE_DASHBOARD_FALSE } from '../../../constants/dashboardConstants'
 import MetaData from '../../layout/MetaData'
 import ConfirmRegister from './ConfirmRegister'
 
-const Register = ({ history }) => {
+const Register = () => {
     const dispatch = useDispatch()
 
-    
+    const [submitted, setSubmitted] = useState(false)
     const [user, setUser] = useState({
         firstName: '',
         middleName: '',
@@ -20,9 +19,7 @@ const Register = ({ history }) => {
         password: '',
         confirmPassword: ''
     })
-
-    const [submitted, setSubmitted] = useState(false)
-
+    
     const { firstName, middleName, lastName, email, studentNumber, course, password, confirmPassword } = user
 
     const upperCase = (text) => text.toUpperCase()
@@ -38,7 +35,7 @@ const Register = ({ history }) => {
 
         setUser({
             ...user,
-            [e.target.name]: e.target.name === 'firstName' || e.target.name === 'lastName' ? upperCase(e.target.value) : e.target.value
+            [e.target.name]: e.target.name === 'firstName' || e.target.name === 'middleName' || e.target.name === 'lastName' ? upperCase(e.target.value) : e.target.value
         })
     }
 
@@ -51,21 +48,22 @@ const Register = ({ history }) => {
             <MetaData title={'Register'} />
             {!submitted ? (
                 <Fragment>
+                    <Container className="space"></Container>
                     <Container fluid>
-                        <div class="progress">
-                            <div
-                                class="progress-bar"
-                                role="progressbar"
-                                style={{ width: '50%' }}
-                                aria-valuenow='50'
-                                aria-valuemin="0"
-                                aria-valuemax="100"
-                            >
-                                50%
-                            </div>
-                        </div>
-                        <Card>
-                            <Card.Body>
+                        <Card style={{ maxWidth: '850px', margin: 'auto' }}>
+                            <Card.Body style={{ margin: '20px' }}>
+                                <div class="progress">
+                                    <div
+                                        class="progress-bar"
+                                        role="progressbar"
+                                        style={{ width: '50%' }}
+                                        aria-valuenow='50'
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                    >
+                                        50%
+                                    </div>
+                                </div>
                                 <Card.Title style={{ margin: '50px 0 20px 0' }}>Register an account</Card.Title>
                                 <Form method='post' onSubmit={submitHandler} encType='application/json'>
                                     <Row className="mb-3">
@@ -189,6 +187,7 @@ const Register = ({ history }) => {
             ) : (
                 <ConfirmRegister studentInfo={user} submitted={submitted} setSubmitted={setSubmitted}/>
             )}
+            <Container className="space"></Container>
         </>
     )
 }

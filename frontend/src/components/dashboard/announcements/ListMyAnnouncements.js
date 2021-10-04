@@ -4,13 +4,14 @@ import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import { Container, Modal, Button } from 'react-bootstrap'
 import { MDBDataTableV5 } from 'mdbreact'
+import { Markup } from 'interweave'
 import { getMyAnnouncements, deleteAnnouncement, archiveAnnouncement, clearErrors } from '../../../actions/announcementActions'
 import { ARCHIVE_ANNOUNCEMENT_RESET, DELETE_ANNOUNCEMENT_RESET } from '../../../constants/announcementConstants'
 import { INSIDE_DASHBOARD_TRUE } from '../../../constants/dashboardConstants'
 import Sidebar from '../../layout/Sidebar'
 import MetaData from '../../layout/MetaData'
 import Loader from '../../layout/Loader'
-var dateFormat = require('dateformat')
+import dateformat from 'dateformat'
 
 const ListMyAnnoucements = ({ history }) => {
     const alert = useAlert()
@@ -25,12 +26,25 @@ const ListMyAnnoucements = ({ history }) => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    const shortenDescription = (description) => {
+        let y = description.split(' ')
+        let z = description.split(' ').slice(0, 50).join(' ')
+
+        if (y.length > 50) {
+            z = z + '...'
+        }
+
+        return z
+    }
+
     useEffect(() => {
         dispatch(getMyAnnouncements())
 
         if (error) {
             alert.error(error)
             dispatch(clearErrors())
+
+            history.push('/error')
         }
 
         if (deleteError) {
@@ -61,7 +75,7 @@ const ListMyAnnoucements = ({ history }) => {
         })
     }, [dispatch, history, alert, error, isDeleted, isUpdated, deleteError])
 
-    const changeDateFormat = (date) => dateFormat(date, "mmm d, yyyy h:MMtt")
+    const changeDateFormat = (date) => dateformat(date, "mmm d, yyyy h:MMtt")
 
     const deleteAnnouncementHandler = (id) => {
         dispatch(deleteAnnouncement(id))
@@ -105,7 +119,7 @@ const ListMyAnnoucements = ({ history }) => {
             data.rows.push({
                 date: changeDateFormat(announcement.createdAt),
                 title: announcement.title,
-                description: announcement.description,
+                description: <Fragment><Markup content={shortenDescription(announcement.description)}/></Fragment>,
                 tags: <Fragment>
                     <span>
                         <p style={{ margin: '0' }}><b>Year Level: </b>{announcement.yearLevel}</p>
@@ -117,7 +131,7 @@ const ListMyAnnoucements = ({ history }) => {
                 actions: <Fragment>
                     <Link to={`/admin/announcement/${announcement._id}`}>
                         <Button variant="primary" className="mr-5" style={{ margin: '5px' }}>
-                            <i class="fa fa-pencil" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
+                            <i class="fa fa-edit" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
                         </Button>
                     </Link>
                     <Button variant="warning" className="mr-5" style={{ margin: '5px' }} onClick={() => {

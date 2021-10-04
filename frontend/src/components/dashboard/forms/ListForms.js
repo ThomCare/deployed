@@ -2,13 +2,14 @@ import React, { Fragment, useEffect } from 'react'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import { Card, Button, Container, Row, Col } from 'react-bootstrap'
+import { Markup } from 'interweave'
 import { getForms, clearErrors } from './../../../actions/formActions'
 import { INSIDE_DASHBOARD_TRUE } from '../../../constants/dashboardConstants'
 import MetaData from './../../layout/MetaData'
 import Loader from './../../layout/Loader'
 import Sidebar from './../../layout/Sidebar'
 
-const ListForms = () => {
+const ListForms = ({ history }) => {
     const dispatch = useDispatch()
     const alert = useAlert()
 
@@ -20,12 +21,14 @@ const ListForms = () => {
         if (error) {
             alert.error(error)
             dispatch(clearErrors())
+
+            history.push('/error')
         }
 
         dispatch({
             type: INSIDE_DASHBOARD_TRUE
         })
-    }, [dispatch, error, alert])
+    }, [dispatch, history, error, alert])
 
     return (
         <Fragment>
@@ -42,7 +45,7 @@ const ListForms = () => {
                                         <Card.Body>
                                             <Card.Title>{form.title}</Card.Title>
                                             <Card.Text>
-                                                {form.description}
+                                                <Markup content={form.description}/>
                                             </Card.Text>
                                             <a href={form.attachments && form.attachments[0].path} target="_blank" rel="noreferrer">
                                                 <Button style={{ margin: '5px' }}>Download</Button>
