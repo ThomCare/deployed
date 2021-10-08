@@ -186,7 +186,7 @@ exports.registerStudent = catchAsyncErrors(async (req, res, next) => {
     const registerToken = jwt.sign({ firstName, middleName, lastName, studentNumber, course, email, password }, process.env.ACCOUNT_TOKEN, { expiresIn: process.env.REGISTER_EXPIRES });
 
     // create reset password url
-    const link = `$https://${req.get('host')}/verify/account/${registerToken}`
+    const link = `https://${req.get('host')}/verify/account/${registerToken}`
 
     try {
         const message = await verifyEmail({ link })
