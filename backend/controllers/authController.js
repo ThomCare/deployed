@@ -218,7 +218,7 @@ exports.verifyStudent = catchAsyncErrors(async (req, res, next) => {
 
             User.findOne({ email }).exec((err, existingUser) => {
                 if (existingUser) { return next(new ErrorHandler('Email already exists')) }
-                const user = await User.create({
+                const user =  User.create({
                     firstName,
                     middleName,
                     lastName,
