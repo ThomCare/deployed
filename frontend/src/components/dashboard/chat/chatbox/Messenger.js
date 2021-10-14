@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState, useRef } from 'react'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
-import { Modal, Button } from 'react-bootstrap'
+import { Modal, Button, FormControl, InputGroup, FloatingLabel } from 'react-bootstrap'
 import { sendMessage, createConversation, clearErrors } from './../../../../actions/chatActions'
 import { ALL_MESSAGES_REQUEST, ALL_MESSAGES_SUCCESS, ALL_MESSAGES_FAIL, ALL_CONVERSATIONS_REQUEST, ALL_CONVERSATIONS_SUCCESS, ALL_CONVERSATIONS_FAIL } from '../../../../constants/chatConstants'
 import { ALL_USERS_REQUEST, ALL_USERS_SUCCESS, ALL_USERS_FAIL } from '../../../../constants/userConstants'
@@ -14,7 +14,6 @@ import MetaData from '../../../layout/MetaData'
 import Sidebar from '../../../layout/Sidebar'
 import Loader from '../../../layout/Loader'
 import './messenger.css'
-import '../online/chatonline.css'
 
 const Messenger = ({ history }) => {
     const dispatch = useDispatch()
@@ -32,7 +31,6 @@ const Messenger = ({ history }) => {
     const [newMessage, setNewMessage] = useState('')
     const [arrivalMessage, setArrivalMessage] = useState('')
     const [conversationList, setConversationList] = useState([])
-    const [onlineUsers, setOnlineUsers] = useState([])
     const [userName, setUserName] = useState('')
     const [search, setSearch] = useState('')
     const [users, setUsers] = useState([])
@@ -140,6 +138,10 @@ const Messenger = ({ history }) => {
     }, [messageList])
 
     useEffect(() => {
+        scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [currentChat])
+
+    useEffect(() => {
         if (conversation) {
             history.push('/messenger')
             setCurrentChat(conversation)
@@ -240,14 +242,11 @@ const Messenger = ({ history }) => {
     useEffect(() => {
         //send something to socket server
         socket.current.emit('addUser', userId)
-        socket.current.on('getUsers', users => {
-            setOnlineUsers(users)
-        })
     }, [])
     //sockets end
 
     return (
-        <>
+        <Fragment>
             <MetaData title={'Messages'} />
             <Sidebar />
             <Modal
@@ -261,7 +260,7 @@ const Messenger = ({ history }) => {
                 </Modal.Header>
                 <Modal.Body>
                     <>
-                        <div className='chatOnline'>
+                        <div className='chatOnline' style={{ maxHeight: '300px', overflowY: 'scroll' }}>
                             {users && users.map(o => (
                                 displayUsers(o)
                             ))}
@@ -278,37 +277,56 @@ const Messenger = ({ history }) => {
 
             <div className='messenger'>
                 <div className='chatMenu'>
-                    <div className='chatMenuWrapper'>
-                        <input
-                            placeholder='Search for friends'
-                            className='chatMenuInput'
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                        <Button onClick={() => searchButton()}>Search</Button>
-                        <Button variant="primary" onClick={handleShow}>
-                            + New message
-                        </Button>
-                        {loading ? <Loader /> : (
-                            conversationList && conversationList.map((c) => (
-                                <Fragment>
-                                    <div onClick={() => {
-                                        setSearch('')
-                                        setCurrentChat(c)
-                                        setUserName(c.names[0] === name ? c.names[1] : c.names[0])
-                                    }}>
-                                        <Conversation receiverName={c.names[0] === name ? c.names[1] : c.names[0]} />
-                                    </div>
-                                </Fragment>
-                            ))
-                        )}
+                    <div className='chatMenuWrapper' style={{ width: '100%' }}>
+                        <div className="buttonsGroup">
+                            <InputGroup className="mb-3">
+                                <FloatingLabel label="Search" style={{ width: '70%' }}>
+                                    <FormControl
+                                        type="search"
+                                        placeholder='Search'
+                                        aria-label="Search"
+                                        size="sm"
+                                        name="search"
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        width="170px"
+                                        right="0px"
+                                    />
+                                </FloatingLabel>
+                                <Button variant="secondary" onClick={() => searchButton()}>
+                                    <span className="fa-sm">
+                                        <i className="fa fa-search"></i>
+                                    </span>
+                                </Button>
+                            </InputGroup>
+                            <Button variant="primary" onClick={handleShow} style={{ width: '85%' }}>
+                                Start a conversation <span className="fa-sm">
+                                    <i className="fa fa-edit"></i>
+                                </span>
+                            </Button>
+                        </div>
+                        <div className="conversationList">
+                            {loading ? <Loader /> : (
+                                conversationList && conversationList.map((c) => (
+                                    <Fragment>
+                                        <div onClick={() => {
+                                            setSearch('')
+                                            setCurrentChat(c)
+                                            setUserName(c.names[0] === name ? c.names[1] : c.names[0])
+                                        }}>
+                                            <Conversation receiverName={c.names[0] === name ? c.names[1] : c.names[0]} />
+                                        </div>
+                                    </Fragment>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div className='chatBox'>
                     <div className='chatBoxWrapper'>
                         {
                             currentChat ? (<>
-                                <p>{userName && userName}</p>
+                                <p className="chatBoxName">{userName && userName}</p>
                                 <div className='chatBoxTop'>
                                     {messagesLoading ? <Loader /> : (
                                         messageList && messageList.map(m => (
@@ -338,8 +356,7 @@ const Messenger = ({ history }) => {
                     </div>
                 </div>
             </div>
-
-        </>
+        </Fragment>
     )
 }
 

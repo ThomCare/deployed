@@ -132,7 +132,7 @@ const ControlPanel = ({ history }) => {
     const setData = () => {
         const data = []
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 7; i++) {
             data.push({
                 name: changeDateFormat(new Date(Date.now() - (i * 24 * 60 * 60 * 1000))),
                 Total: 0
@@ -152,12 +152,29 @@ const ControlPanel = ({ history }) => {
             <Sidebar />
             {listLoading ? <Loader /> : (
                 <div className="row">
-                    <div className="">
-                        <h1 style={{ margin: '50px 0' }}>Control Panel</h1>
-                        <Container fluid>
+                    <div className='control-panel'>
+                        <Container fluid style={{ margin: '100px 0'}}>
+                            <Row style={{ display: 'flex', justifyContent: 'center' }}>
+                                {user.role === 'Student' ? (
+                                    <Fragment>
+                                        <center>
+                                            <Col sm><ReportCard requestType={'Requests'} length={requests && requests.length} icon={'edit'} color={'red'} /></Col>
+                                        </center>
+                                    </Fragment>
+                                ) : (
+                                    <Fragment>
+                                        <Col sm><ReportCard requestType={'Requests'} length={requests && requests.length} icon={'edit'} color={'red'} /></Col>
+                                        <Col sm><ReportCard requestType={'Pending'} length={pending && pending.length} icon={'paperclip'} color={'blue'} /></Col>
+                                        <Col sm><ReportCard requestType={'Processing'} length={processing && processing.length} icon={'spinner'} color={'yellow'} /></Col>
+                                        <Col sm><ReportCard requestType={'Denied'} length={denied && denied.length} icon={'times-circle'} color={'blue'} /></Col>
+                                        <Col sm><ReportCard requestType={'Approved'} length={approved && approved.length} icon={'check-circle'} color={'red'} /></Col>
+                                    </Fragment>
+                                )}
+                            </Row>
                             {user.role !== 'Student' ? (
                                 <Fragment>
-                                    <Row style={{ display: 'flex', justifyContent: 'center', margin: '50px 0' }}>
+                                    <Row style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
+                                        <h4 style={{ paddingLeft: '40px'}}>Weekly chart</h4>
                                         <ResponsiveContainer width={'99%'} height={300}>
                                             <LineChart width={600} height={300} data={setData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                                                 <Line type="monotone" dataKey="Total" stroke="#8884d8" />
@@ -170,21 +187,6 @@ const ControlPanel = ({ history }) => {
                                     </Row>
                                 </Fragment>
                             ) : <Fragment></Fragment>}
-                            <Row style={{ display: 'flex', justifyContent: 'center' }}>
-                                {user.role === 'Student' ? (
-                                    <Fragment>
-                                        <Col sm><ReportCard requestType={'Requests'} length={requests && requests.length} icon={'edit'} color={'red'} /></Col>
-                                    </Fragment>
-                                ) : (
-                                    <Fragment>
-                                        <Col sm><ReportCard requestType={'Requests'} length={requests && requests.length} icon={'edit'} color={'red'} /></Col>
-                                        <Col sm><ReportCard requestType={'Pending'} length={pending && pending.length} icon={'paperclip'} color={'blue'} /></Col>
-                                        <Col sm><ReportCard requestType={'Processing'} length={processing && processing.length} icon={'spinner'} color={'yellow'} /></Col>
-                                        <Col sm><ReportCard requestType={'Denied'} length={denied && denied.length} icon={'times-circle'} color={'blue'} /></Col>
-                                        <Col sm><ReportCard requestType={'Approved'} length={approved && approved.length} icon={'check-circle'} color={'red'} /></Col>
-                                    </Fragment>
-                                )}
-                            </Row>
                             <Row>
                                 <h3>Latest submissions</h3>
                                 {recentsLoading ? <Loader /> : (
@@ -197,13 +199,15 @@ const ControlPanel = ({ history }) => {
                                     />
                                 )}
                             </Row>
-                            <Row>
-                                <Link to={link}>
-                                    <Button style={{ marginBottom: '20px' }}>
-                                        View All Requests
+                            <div style={{ display: 'flex', marginBottom: '20px' }}>
+                                <div style={{ marginLeft: 'auto' }}>
+                                    <Link to={link}>
+                                        <Button style={{ marginBottom: '20px' }}>
+                                            View All Requests
                                     </Button>
-                                </Link>
-                            </Row>
+                                    </Link>
+                                </div>
+                            </div>
                         </Container>
                     </div>
                 </div>

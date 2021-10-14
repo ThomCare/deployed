@@ -8,7 +8,7 @@ import { REGISTER_USER_RESET } from '../../../constants/userConstants'
 import { INSIDE_DASHBOARD_FALSE } from '../../../constants/dashboardConstants'
 import MetaData from '../../layout/MetaData'
 
-const ConfirmRegister = ({ history, studentInfo, submitted, setSubmitted }) => {
+const ConfirmRegister = ({ history, studentInfo, currentStep, setCurrentStep }) => {
     const alert = useAlert()
     const dispatch = useDispatch()
 
@@ -16,7 +16,7 @@ const ConfirmRegister = ({ history, studentInfo, submitted, setSubmitted }) => {
 
     const [success, setSuccess] = useState(false)
 
-    const goBack = () => setSubmitted(!submitted)
+    const goBack = () => setCurrentStep(currentStep - 1)
 
     useEffect(() => {
         if (error) {
@@ -49,30 +49,28 @@ const ConfirmRegister = ({ history, studentInfo, submitted, setSubmitted }) => {
             <MetaData title={'Confirm Student Information'} />
             {!success ? (
                 <Fragment>
-                    <Container className="space"></Container>
-                    <Container fluid>
-                        <Card style={{ maxWidth: '30rem', marginTop: '40px', margin: 'auto' }}>
+                    <Container fluid style={{ padding: "50px 20px" }}>
+                        <center>
+                            <h3>Confirm student information</h3>
+                            <p className="text-muted" style={{ fontSize: '12px', textAlign: 'center', marginBottom: '20px', maxWidth: '30rem' }}>
+                                Kindly confirm your student information below.
+                                Once submitted, you will not be able to update your profile (Contact your administrator to request for a profile update).
+                            </p>
+                        </center>
+                        <Card style={{ maxWidth: '600px', marginTop: '40px', margin: 'auto', backgroundColor: "#F5F5F5", borderTop: '7px solid #9c0b0b' }}>
                             <Card.Body>
                                 <div class="progress">
                                     <div
                                         class="progress-bar"
                                         role="progressbar"
-                                        style={{ width: '90%' }}
-                                        aria-valuenow='90'
+                                        style={{ width: '50%' }}
+                                        aria-valuenow='50'
                                         aria-valuemin="0"
                                         aria-valuemax="100"
                                     >
-                                        90%
+                                        50%
                                     </div>
                                 </div>
-                                <Card.Title style={{ textAlign: 'center' }}>Confirm Student Information</Card.Title>
-                                <Card.Subtitle
-                                    className="text-muted"
-                                    style={{ fontSize: '12px', textAlign: 'center', marginBottom: '20px' }}
-                                >
-                                    Kindly confirm your student information below.
-                                    Once submitted, you will not be able to update your profile (Contact your administrator to request for a profile update).
-                                </Card.Subtitle>
                                 <Card.Text><b>Name:</b> {studentInfo.firstName}{studentInfo.middleName ? ' ' + studentInfo.middleName + ' ' : ' '}{studentInfo.lastName}</Card.Text>
                                 <Card.Text><b>Student Number:</b> {studentInfo.studentNumber}</Card.Text>
                                 <Card.Text><b>Course:</b> {studentInfo.course}</Card.Text>
@@ -105,12 +103,37 @@ const ConfirmRegister = ({ history, studentInfo, submitted, setSubmitted }) => {
                 </Fragment>
             ) : (
                 <Fragment>
-                    <h1>Registration sent. Check your email to verify your registration.</h1>
-                    <Link to='/'>
-                        <Button>
-                            Go to home
-                        </Button>
-                    </Link>
+                    <Container fluid style={{ padding: "50px 20px" }}>
+                        <center>
+                            <h3>Almost there!</h3>
+                        </center>
+                        <Card style={{ maxWidth: '600px', marginTop: '40px', margin: 'auto', backgroundColor: "#F5F5F5", borderTop: '7px solid #9c0b0b' }}>
+                            <Card.Body>
+                                <div class="progress">
+                                    <div
+                                        class="progress-bar"
+                                        role="progressbar"
+                                        style={{ width: '100%' }}
+                                        aria-valuenow='100'
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                    >
+                                        100%
+                                    </div>
+                                </div>
+                                <Card.Text style={{ textAlign: 'center', paddingBottom: '50px' }}>Registration is being processed. Kindly check your inbox to see the verification link sent to your email.</Card.Text>
+                                <center>
+                                    <Link to='/'>
+                                        <Button variant="outline-primary">
+                                            <span>
+                                                <i class="fa fa-home" style={{ textAlign: 'center' }}></i>
+                                            </span> Go back home
+                                        </Button>
+                                    </Link>
+                                </center>
+                            </Card.Body>
+                        </Card>
+                    </Container>
                 </Fragment>
             )}
         </>

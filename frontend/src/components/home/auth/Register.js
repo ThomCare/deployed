@@ -1,14 +1,15 @@
 import React, { Fragment, useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { Form, Button, Card, Container, Row, Col } from 'react-bootstrap'
+import { Form, Button, Card, Container, Row, Col, InputGroup } from 'react-bootstrap'
 import { INSIDE_DASHBOARD_FALSE } from '../../../constants/dashboardConstants'
 import MetaData from '../../layout/MetaData'
-import ConfirmRegister from './ConfirmRegister'
+import Step2 from './Step2'
 
 const Register = () => {
     const dispatch = useDispatch()
 
-    const [submitted, setSubmitted] = useState(false)
+    const [currentStep, setCurrentStep] = useState(1)
+
     const [user, setUser] = useState({
         firstName: '',
         middleName: '',
@@ -19,8 +20,8 @@ const Register = () => {
         password: '',
         confirmPassword: ''
     })
-    
-    const { firstName, middleName, lastName, email, studentNumber, course, password, confirmPassword } = user
+
+    const { firstName, middleName, lastName, studentNumber, course } = user
 
     const upperCase = (text) => text.toUpperCase()
 
@@ -39,35 +40,34 @@ const Register = () => {
         })
     }
 
-    const submitHandler = e => {
-        setSubmitted(!submitted)
+    const addStep = () => {
+        setCurrentStep(currentStep + 1)
     }
 
     return (
-        <>
+        <Fragment>
             <MetaData title={'Register'} />
-            {!submitted ? (
+            {currentStep === 1 ? (
                 <Fragment>
-                    <Container className="space"></Container>
-                    <Container fluid>
-                        <Card style={{ maxWidth: '850px', margin: 'auto' }}>
+                    <Container fluid style={{ padding: "50px 20px" }}>
+                        <center><h3>Register an account</h3></center>
+                        <Card style={{ maxWidth: '600px', marginTop: '40px', margin: 'auto', backgroundColor: "#F5F5F5", borderTop: '7px solid #9c0b0b' }}>
                             <Card.Body style={{ margin: '20px' }}>
                                 <div class="progress">
                                     <div
                                         class="progress-bar"
                                         role="progressbar"
-                                        style={{ width: '50%' }}
-                                        aria-valuenow='50'
+                                        style={{ width: '0%' }}
+                                        aria-valuenow='0'
                                         aria-valuemin="0"
                                         aria-valuemax="100"
                                     >
-                                        50%
+                                        0%
                                     </div>
                                 </div>
-                                <Card.Title style={{ margin: '50px 0 20px 0' }}>Register an account</Card.Title>
-                                <Form method='post' onSubmit={submitHandler} encType='application/json'>
+                                <Form method="post" onSubmit={addStep}>
                                     <Row className="mb-3">
-                                        <Form.Group as={Col} md={5} style={{ marginTop: '5px' }}>
+                                        <Form.Group as={Col} xs={12} lg={5} style={{ marginTop: '5px' }}>
                                             <Form.Label>First Name</Form.Label>
                                             <Form.Control
                                                 type="text"
@@ -79,7 +79,7 @@ const Register = () => {
                                                 required
                                             />
                                         </Form.Group>
-                                        <Form.Group as={Col} md={3} style={{ marginTop: '5px' }}>
+                                        <Form.Group as={Col} xs={12} lg={3} style={{ marginTop: '5px' }}>
                                             <Form.Label>Middle Name</Form.Label>
                                             <Form.Control
                                                 type="text"
@@ -90,7 +90,7 @@ const Register = () => {
                                                 pattern="([A-zÀ-ž\s]){2,}"
                                             />
                                         </Form.Group>
-                                        <Form.Group as={Col} md={4} style={{ marginTop: '5px' }}>
+                                        <Form.Group as={Col} xs={12} lg={4} style={{ marginTop: '5px' }}>
                                             <Form.Label>Last Name</Form.Label>
                                             <Form.Control
                                                 type="text"
@@ -104,7 +104,7 @@ const Register = () => {
                                         </Form.Group>
                                     </Row>
                                     <Row className="mb-3">
-                                        <Form.Group className="mb-3" as={Col} md={6}>
+                                        <Form.Group className="mb-3" as={Col} xs={12} lg={6}>
                                             <Form.Label>Student Number</Form.Label>
                                             <Form.Control
                                                 placeholder="20xxxxxxxx"
@@ -115,80 +115,40 @@ const Register = () => {
                                                 required
                                             />
                                         </Form.Group>
-                                        <Form.Group className="mb-3" as={Col} md={6}>
+                                        <Form.Group className="mb-3" as={Col} xs={12} lg={6}>
                                             <Form.Label>Course/Program</Form.Label>
                                             <Form.Select
-                                                aria-label="Default select example"
                                                 name="course"
                                                 value={course}
                                                 onChange={onChange}
                                                 required
                                             >
-                                                <option>-</option>
+                                                <option value=''>-</option>
                                                 <option value="Computer Science">Computer Science</option>
                                                 <option value="Information Systems">Information Systems</option>
                                                 <option value="Information Technology">Information Technology</option>
                                             </Form.Select>
                                         </Form.Group>
                                     </Row>
-                                    <Row>
-                                        <Form.Group className="mb-3" as={Col}>
-                                            <Form.Label>Email address</Form.Label>
-                                            <Form.Control
-                                                type='email'
-                                                placeholder="juan.delacruz.iics@ust.edu.ph"
-                                                pattern="[a-z]{1,}\.[a-z]{1,}\.(iics|cics)@ust\.edu\.ph"
-                                                name="email"
-                                                value={email}
-                                                onChange={onChange}
-                                                required
-                                            />
-                                        </Form.Group>
-                                    </Row>
-                                    <Row className="mb-3">
-                                        <Form.Group as={Col} md={6} style={{ marginTop: '5px' }}>
-                                            <Form.Label>Password</Form.Label>
-                                            <Form.Control
-                                                type="password"
-                                                placeholder="Password"
-                                                name="password"
-                                                value={password}
-                                                onChange={onChange}
-                                                minlength='6'
-                                                required
-                                            />
-                                        </Form.Group>
-                                        <Form.Group as={Col} md={6} style={{ marginTop: '5px' }}>
-                                            <Form.Label>Confirm Password</Form.Label>
-                                            <Form.Control
-                                                type="password"
-                                                placeholder="Confirm Password"
-                                                name="confirmPassword"
-                                                value={confirmPassword}
-                                                onChange={onChange}
-                                                minlength='6'
-                                                required
-                                            />
-                                        </Form.Group>
-                                    </Row>
                                     <center>
                                         <Button
-                                            type='submit'
-                                            style={{ marginTop: '10px', borderRadius: '50px', width: '10rem' }}
+                                            variant='danger'
+                                            style={{ marginRight: '5px', marginTop: '10px', borderRadius: '50px', width: '10rem' }}
+                                            disabled={true}
                                         >
+                                            Back
+                                    </Button>
+                                        <Button type='submit' style={{ marginTop: '10px', borderRadius: '50px', width: '10rem' }}>
                                             Next
-                                        </Button>
+                                    </Button>
                                     </center>
                                 </Form>
                             </Card.Body>
                         </Card>
                     </Container>
                 </Fragment>
-            ) : (
-                <ConfirmRegister studentInfo={user} submitted={submitted} setSubmitted={setSubmitted}/>
-            )}
-            <Container className="space"></Container>
-        </>
+            ) : (<Step2 studentInfo={user} currentStep={currentStep} setCurrentStep={setCurrentStep} />)}
+        </Fragment>
     )
 }
 
