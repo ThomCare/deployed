@@ -574,6 +574,9 @@ exports.assignRequestToSelfCICS = catchAsyncErrors(async (req, res, next) => {
 
     if (!request) { return next(new ErrorHandler(`Request does not exist with this id:(${req.params.requestId})`)) }
 
+    if(request.managedBy != ""){
+        return next(new ErrorHandler(`This request is already been assigned to a CICS Staff`))
+    }
     const newRequestData = { managedBy: req.user.id }
 
     request = await Request.findByIdAndUpdate(req.params.requestId, newRequestData, {
