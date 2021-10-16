@@ -214,18 +214,18 @@ exports.getDeptChairRequests = catchAsyncErrors(async (req, res, next) => {
     const denied = await getRequestsDenied.query;
     const crossEnrollment = await getRequestsCrossEnrollment.query;
 
-    const dates = []
-    const stats = []
+    const dailyDates = []
+    const dailyStats = []
 
     for (let i = 0; i < 8; i++) {
-        dates.push(new Date(Date.now() - ((i - 1) * 24 * 60 * 60 * 1000)).setHours(0, 0, 0, 0))
+        dailyDates.push(new Date(Date.now() - ((i - 1) * 24 * 60 * 60 * 1000)).setHours(0, 0, 0, 0))
     }
 
-    for (let i = 0; i < dates.length - 1; i++) {
+    for (let i = 0; i < dailyDates.length - 1; i++) {
         const x = await Request.find({
             createdAt: {
-                "$gt": dates[i + 1].toString(),
-                "$lte": dates[i].toString()
+                "$gt": dailyDates[i + 1].toString(),
+                "$lte": dailyDates[i].toString()
             },
             "requestorInfo.course": deptCourse,
             requestType: {
@@ -233,7 +233,52 @@ exports.getDeptChairRequests = catchAsyncErrors(async (req, res, next) => {
             }
         })
 
-        stats.push(x.length)
+        dailyStats.push(x.length)
+    }
+
+    const weeklyDates = []
+    const weeklyStats = []
+
+    for (let i = 0; i < 5; i++) {
+        weeklyDates.push(new Date(Date.now() - ((i * 7) * 24 * 60 * 60 * 1000)).setHours(0, 0, 0, 0))
+    }
+
+    for (let i = 0; i < weeklyDates.length - 1; i++) {
+        const x = await Request.find({
+            createdAt: {
+                "$gt": weeklyDates[i + 1].toString(),
+                "$lte": weeklyDates[i].toString()
+            },
+            "requestorInfo.course": deptCourse,
+            requestType: {
+                $nin: requestTypeOfficeStaff
+            }
+        })
+
+        weeklyStats.push(x.length)
+    }
+
+    const dates = [0, 1,7,30,60]
+    const overViewDates = []
+    const overViewStats = []
+
+    for (let i = 0; i < dates.length; i++) {
+        overViewDates.push(new Date(Date.now() - ((dates[i] - 1) * 24 * 60 * 60 * 1000)).setHours(0, 0, 0, 0))
+    }
+
+    for (let i = 0; i < overViewDates.length - 1; i++) {
+        const x = await Request.find({
+            createdAt: {
+                "$gt": overViewDates[i + 1].toString(),
+                "$lte": overViewDates[0].toString()
+            },
+            "requestorInfo.course": deptCourse,
+            requestType: {
+                $nin: requestTypeOfficeStaff
+            }
+        })
+
+        overViewStats.push(x.length)
     }
 
     res.status(200).json({
@@ -245,7 +290,9 @@ exports.getDeptChairRequests = catchAsyncErrors(async (req, res, next) => {
         approved,
         denied,
         crossEnrollment,
-        stats
+        dailyStats,
+        weeklyStats,
+        overViewStats
     })
 })
 
@@ -289,22 +336,59 @@ exports.getAllRequests = catchAsyncErrors(async (req, res, next) => {
     const approved = await getRequestsApproved.query;
     const denied = await getRequestsDenied.query;
 
-    const dates = []
-    const stats = []
+    const dailyDates = []
+    const dailyStats = []
 
     for (let i = 0; i < 8; i++) {
-        dates.push(new Date(Date.now() - ((i - 1) * 24 * 60 * 60 * 1000)).setHours(0, 0, 0, 0))
+        dailyDates.push(new Date(Date.now() - ((i - 1) * 24 * 60 * 60 * 1000)).setHours(0, 0, 0, 0))
     }
 
-    for (let i = 0; i < dates.length - 1; i++) {
+    for (let i = 0; i < dailyDates.length - 1; i++) {
         const x = await Request.find({
             createdAt: {
-                "$gt": dates[i + 1].toString(),
-                "$lte": dates[i].toString()
+                "$gt": dailyDates[i + 1].toString(),
+                "$lte": dailyDates[i].toString()
             }
         })
 
-        stats.push(x.length)
+        dailyStats.push(x.length)
+    }
+
+    const weeklyDates = []
+    const weeklyStats = []
+
+    for (let i = 0; i < 5; i++) {
+        weeklyDates.push(new Date(Date.now() - ((i * 7) * 24 * 60 * 60 * 1000)).setHours(0, 0, 0, 0))
+    }
+
+    for (let i = 0; i < weeklyDates.length - 1; i++) {
+        const x = await Request.find({
+            createdAt: {
+                "$gt": weeklyDates[i + 1].toString(),
+                "$lte": weeklyDates[i].toString()
+            }
+        })
+
+        weeklyStats.push(x.length)
+    }
+
+    const dates = [0, 1,7,30,60]
+    const overViewDates = []
+    const overViewStats = []
+
+    for (let i = 0; i < dates.length; i++) {
+        overViewDates.push(new Date(Date.now() - ((dates[i] - 1) * 24 * 60 * 60 * 1000)).setHours(0, 0, 0, 0))
+    }
+
+    for (let i = 0; i < overViewDates.length - 1; i++) {
+        const x = await Request.find({
+            createdAt: {
+                "$gt": overViewDates[i + 1].toString(),
+                "$lte": overViewDates[0].toString()
+            }
+        })
+
+        overViewStats.push(x.length)
     }
 
     res.status(200).json({
@@ -315,7 +399,9 @@ exports.getAllRequests = catchAsyncErrors(async (req, res, next) => {
         processing,
         approved,
         denied,
-        stats
+        dailyStats,
+        weeklyStats,
+        overViewStats
     })
 })
 
@@ -573,10 +659,10 @@ exports.assignRequestToSelfCICS = catchAsyncErrors(async (req, res, next) => {
     let request = await Request.findById(req.params.requestId);
 
     if (!request) { return next(new ErrorHandler(`Request does not exist with this id:(${req.params.requestId})`)) }
-
     if(request.managedBy != ""){
         return next(new ErrorHandler(`This request is already been assigned to a CICS Staff`))
     }
+
     const newRequestData = { managedBy: req.user.id }
 
     request = await Request.findByIdAndUpdate(req.params.requestId, newRequestData, {

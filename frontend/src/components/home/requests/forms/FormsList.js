@@ -1,18 +1,29 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import { Table, Container, Button } from 'react-bootstrap'
-
+import { INSIDE_DASHBOARD_FALSE } from '../../../../constants/dashboardConstants'
+import MetaData from './../../../layout/MetaData'
 
 const FormsList = () => {
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch({
+            type: INSIDE_DASHBOARD_FALSE
+        })
+    }, [dispatch])
+
     return (
         <Fragment>
+            <MetaData title={'Forms'}/>
             <Container>
                 <div id="rectangle" >
                     <h3>FORMS</h3>
                 </div>
             </Container>
-                <Container fluid style={{ padding: "50px 20px" }}>
-                <Table bordered hover size="sm" style={{ paddingTop: '100px', marginTop: '50px', justifyContent: 'center' }}>
+            <Container fluid style={{ marginTop: '50px', padding: "50px 20px", fontFamily: 'MuktaMalar' }}>
+                <Table bordered hover size="sm" style={{ justifyContent: 'center' }}>
                     <thead>
                         <tr style={{ textAlign: 'center' }}>
                             <th>Document Code</th>
@@ -27,11 +38,11 @@ const FormsList = () => {
                             <td>
                                 <Link to='/forms/form-6a'>
                                     <Button variant="primary" style={{ margin: '5px' }}>
-                                        <i class="fa fa-edit-square-o" aria-hidden="true"></i> Fill out
+                                        <i class="fa fa-edit" aria-hidden="true"></i>
                                     </Button>
                                 </Link>
                                 <Button variant="warning" href="https://drive.google.com/file/d/11UDJbETgsYGSlfwU6MH-fqQsaUFH5lMd/view?usp=sharing" target="_blank" rel="noreferrer" style={{ margin: '5px' }}>
-                                    <i class="fa fa-eye" aria-hidden="true"></i> View
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
                                 </Button>
                             </td>
                         </tr>
@@ -41,25 +52,24 @@ const FormsList = () => {
                             <td>
                                 <Link to='/forms/form-6b'>
                                     <Button variant="primary" style={{ margin: '5px' }}>
-                                        <i class="fa fa-edit-square-o" aria-hidden="true"></i> Fill out
+                                        <i class="fa fa-edit" aria-hidden="true"></i>
                                     </Button>
                                 </Link>
                                 <Button variant="warning" href="https://drive.google.com/file/d/1JFb7kCERjKkJZXJbkmdACewAobS7i_UF/view?usp=sharing" target="_blank" rel="noreferrer" style={{ margin: '5px' }}>
-                                    <i class="fa fa-eye" aria-hidden="true"></i> View
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
                                 </Button></td>
                         </tr>
-                        
                         <tr>
                             <td>Overload Form</td>
                             <td>Request for Overload</td>
                             <td>
                                 <Link to='/forms/overload-form'>
                                     <Button variant="primary" style={{ margin: '5px' }}>
-                                        <i class="fa fa-edit-square-o" aria-hidden="true"></i> Fill out
+                                        <i class="fa fa-edit" aria-hidden="true"></i>
                                     </Button>
                                 </Link>
                                 <Button variant="warning" href="https://drive.google.com/file/d/1T5FATdMcVEhhTsfrqkEOKudhWF7rkvE_/view?usp=sharing" target="_blank" rel="noreferrer" style={{ margin: '5px' }}>
-                                    <i class="fa fa-eye" aria-hidden="true"></i> View
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
                                 </Button></td>
                         </tr>
                         <tr>
@@ -68,7 +78,7 @@ const FormsList = () => {
                             <td>
                                 <Link to='/download/forms/list'>
                                     <Button variant="warning" style={{ margin: '5px' }}>
-                                        <i class="fa fa-eye" aria-hidden="true"></i> View
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
                                     </Button>
                                 </Link>
                             </td>

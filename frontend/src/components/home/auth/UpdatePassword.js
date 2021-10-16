@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
-import { FloatingLabel, Form, Button, Card, Container, Row, InputGroup } from 'react-bootstrap'
+import { FloatingLabel, Form, Button, Card, Container, Row, InputGroup, Modal } from 'react-bootstrap'
 import { updatePassword, clearErrors } from './../../../actions/userActions'
 import { UPDATE_PASSWORD_RESET } from './../../../constants/userConstants'
 import { INSIDE_DASHBOARD_TRUE } from '../../../constants/dashboardConstants'
@@ -21,10 +21,18 @@ const UpdatePassword = ({ history }) => {
     const [showOld, setShowOld] = useState('false')
     const [showPassword, setShowPassword] = useState('false')
     const [showConfirm, setShowConfirm] = useState('false')
+    const [show, setShow] = useState(false)
 
     const showOldToggle = () => setShowOld(!showOld)
     const showPasswordToggle = () => setShowPassword(!showPassword)
     const showConfirmToggle = () => setShowConfirm(!showConfirm)
+    const handleClose = () => setShow(false)
+    const handleShow = () => setShow(true)
+
+        const goBack = () => {
+        window.history.back()
+        handleClose()
+    }
 
     useEffect(() => {
         if (isUpdated) {
@@ -55,69 +63,99 @@ const UpdatePassword = ({ history }) => {
         <>
             <MetaData title={'Update Password'} />
             <Sidebar />
-            <Container fluid>
-                <Row className='justify-content-md-center' style={{ marginTop: '50px' }}>
-                    <Card style={{ backgroundColor: "#F5F5F5", width: '30rem', align: 'center', borderTop: '10px solid #9c0b0b', marginBottom: '50px' }}>
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Are you sure you want to discard any changes?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Any changes done will be gone.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={goBack}>Yes, I'm sure</Button>
+                </Modal.Footer>
+            </Modal>
+            <Container fluid style={{ marginTop: '50px' }}>
+                <Row className='justify-content-md-center'>
+                    <Card style={{ backgroundColor: "#F5F5F5", width: '30rem', align: 'center', borderTop: '10px solid #9c0b0b', margin: '50px 0' }}>
                         <Card.Body>
                             <Card.Title style={{ margin: '20px 0 20px 0', fontWeight: "bold" }}>Update Password</Card.Title>
                             <Form onSubmit={submitHandler}>
-                                <InputGroup className="mb-3">
-                                    <FloatingLabel label="Old Password" style={{ width: '89%' }}>
+                                <Form.Group style={{ marginTop: '5px' }}>
+                                    <Form.Label>Old Password</Form.Label>
+                                    <InputGroup className="mb-3">
                                         <Form.Control
                                             type={showOld ? "password" : "text"}
-                                            placeholder="mypassword"
+                                            placeholder="••••••"
                                             name="oldPassword"
                                             value={oldPassword}
                                             onChange={e => setOldPassword(e.target.value)}
                                             required
                                         />
-                                    </FloatingLabel>
-                                    <Button variant="secondary" onClick={showOldToggle}>
-                                        <span className="fa-sm">
-                                            <i className={showOld ? "fa fa-eye-slash" : "fa fa-eye"}></i>
-                                        </span>
-                                    </Button>
-                                </InputGroup>
-                                <InputGroup className="mb-3">
-                                    <FloatingLabel label="New Password" style={{ width: '89%' }}>
+                                        <Button variant="secondary" onClick={showOldToggle}>
+                                            <span className="fa-sm">
+                                                <i className={showOld ? "fa fa-eye-slash" : "fa fa-eye"}></i>
+                                            </span>
+                                        </Button>
+                                    </InputGroup>
+                                </Form.Group>
+                                <Form.Group style={{ marginTop: '5px' }}>
+                                    <Form.Label>New Password</Form.Label>
+                                    <InputGroup className="mb-3">
                                         <Form.Control
                                             type={showPassword ? "password" : "text"}
-                                            placeholder="mypassword"
+                                            placeholder="••••••"
                                             name="password"
                                             value={password}
                                             onChange={e => setPassword(e.target.value)}
                                             minlength="6"
                                             required
                                         />
-                                    </FloatingLabel>
-                                    <Button variant="secondary" onClick={showPasswordToggle}>
-                                        <span className="fa-sm">
-                                            <i className={showPassword ? "fa fa-eye-slash" : "fa fa-eye"}></i>
-                                        </span>
-                                    </Button>
-                                </InputGroup>
-                                <InputGroup className="mb-3">
-                                    <FloatingLabel label="Confirm new password" style={{ width: '89%' }}>
+                                        <Button variant="secondary" onClick={showPasswordToggle}>
+                                            <span className="fa-sm">
+                                                <i className={showPassword ? "fa fa-eye-slash" : "fa fa-eye"}></i>
+                                            </span>
+                                        </Button>
+                                    </InputGroup>
+                                </Form.Group>
+                                <Form.Group style={{ marginTop: '5px' }}>
+                                    <Form.Label>Confirm New Password</Form.Label>
+                                    <InputGroup className="mb-3">
                                         <Form.Control
                                             type={showConfirm ? "password" : "text"}
-                                            placeholder="mypassword"
+                                            placeholder="••••••"
                                             name="confirmPassword"
                                             value={confirmPassword}
                                             onChange={e => setConfirmPassword(e.target.value)}
                                             minlength="6"
                                             required
                                         />
-                                    </FloatingLabel>
-                                    <Button variant="secondary" onClick={showConfirmToggle}>
-                                        <span className="fa-sm">
-                                            <i className={showConfirm ? "fa fa-eye-slash" : "fa fa-eye"}></i>
-                                        </span>
-                                    </Button>
-                                </InputGroup>
+                                        <Button variant="secondary" onClick={showConfirmToggle}>
+                                            <span className="fa-sm">
+                                                <i className={showConfirm ? "fa fa-eye-slash" : "fa fa-eye"}></i>
+                                            </span>
+                                        </Button>
+                                    </InputGroup>
+                                </Form.Group>
                                 <center>
                                     <Button
+                                        type='button'
+                                        style={{ margin: '10px 5px', borderRadius: '50px', width: '10rem' }}
+                                        disabled={loading ? true : false}
+                                        variant='outline-secondary'
+                                        onClick={handleShow}>
+                                        Discard
+                                    </Button>
+                                    <Button
                                         type='submit'
-                                        style={{ marginTop: '10px', borderRadius: '50px', width: '10rem' }}
+                                        style={{ margin: '10px 5px', borderRadius: '50px', width: '10rem' }}
                                         disabled={loading ? true : false}>
                                         {loading ? (
                                             <span>

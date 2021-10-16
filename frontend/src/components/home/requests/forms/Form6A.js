@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
-import { FloatingLabel, Row, Container, Button, Col, Card, Form, Breadcrumb } from 'react-bootstrap'
+import { FloatingLabel, Row, Container, Button, Col, Card, Form, Breadcrumb, Modal } from 'react-bootstrap'
 import TimePicker from 'react-time-picker'
 import { getCourses, clearErrors } from '../../../../actions/courseActions'
 import { INSIDE_DASHBOARD_FALSE } from '../../../../constants/dashboardConstants'
@@ -27,6 +27,9 @@ function Form6A({ history }) {
     const [submitted, setSubmitted] = useState(false)
     const [middleInitial, setMiddleInitial] = useState('')
     const [studentInfo, setStudentInfo] = useState({})
+
+    const [show, setShow] = useState(false)
+
     const [inputFields, setInputFields] = useState([{
         status: '',
         courseCode: '',
@@ -41,6 +44,14 @@ function Form6A({ history }) {
     }])
 
     const title = 'Form 6A - Add/Drop Course Form'
+
+    const handleClose = () => setShow(false)
+    const handleShow = () => setShow(true)
+
+        const goBack = () => {
+        window.history.back()
+        handleClose()
+    }
 
     const addRow = () => {
         setInputFields([...inputFields, {
@@ -174,6 +185,25 @@ function Form6A({ history }) {
     return (
         <Fragment>
             <MetaData title={title} />
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Are you sure you want to discard any changes?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Any changes done will be gone.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={goBack}>Yes, I'm sure</Button>
+                </Modal.Footer>
+            </Modal>
             {loading ? <Loader /> : !submitted ? (
                 <Container classname="align-me" fluid style={{ paddingBottom: '100px', paddingTop: '40px' }}>
                     <Card style={{ backgroundColor: '#fff', width: '100%' }}>  {/*, width: '100rem', backgroundColor: '#9c0b0b' */}
@@ -342,7 +372,7 @@ function Form6A({ history }) {
                                                 <Col xs={6} sm={6} md={4} lg={5} style={addDropStyle}>
                                                     <Row className="mt-3">
                                                         <Form.Group as={Col} xs={6}>
-                                                            <Form.Label>Start Time</Form.Label>
+                                                            <Form.Label>Start Time&nbsp;</Form.Label>
                                                             <TimePicker
                                                                 disableClock
                                                                 name="startTime"
@@ -369,7 +399,7 @@ function Form6A({ history }) {
                                                             />
                                                         </Form.Group>
                                                         <Form.Group as={Col} xs={6}>
-                                                            <Form.Label>End Time</Form.Label>
+                                                            <Form.Label>End Time&nbsp;</Form.Label>
                                                             <TimePicker
                                                                 disableClock
                                                                 name="endTime"
@@ -410,7 +440,17 @@ function Form6A({ history }) {
                                         </Fragment>
                                     )})
                                 }
-                                <center><Button type='submit' style={{ marginTop: '10px', borderRadius: '50px', width: '10rem' }} disabled={user.role !== 'Student' ? true : false}>Generate Form</Button></center>
+                                <center>
+                                    <Button
+                                        type='button'
+                                        style={{ margin: '10px 5px', borderRadius: '50px', width: '10rem' }}
+                                        disabled={loading ? true : false}
+                                        variant='outline-secondary'
+                                        onClick={handleShow}>
+                                        Discard
+                                    </Button>
+                                    <Button type='submit' style={{ margin: '10px 5px', borderRadius: '50px', width: '10rem' }} disabled={user.role !== 'Student' ? true : false}>Generate Form</Button>
+                                </center>
                             </Form>
                         </Card.Body>
                     </Card>
