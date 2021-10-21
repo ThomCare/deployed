@@ -30,11 +30,24 @@ const UpdateRequest = ({ history, match }) => {
     const [remarksMessage, setRemarksMessage] = useState([])
     const [show, setShow] = useState(false)
 
-    const status = ["Pending", "Processing", "Denied", "Approved"]
+    const [status, setStatus] = useState([])
+
+    const normalStatus = ['Pending', 'Processing', 'Denied', 'Approved']
+    const crossEnrolStatus = [
+        'Processing',
+        'Pending for CS Approval',
+        'Pending for IS Approval',
+        'Pending for IT Approval',
+        'Approved by CS',
+        'Approved by IS',
+        'Approved by IT',
+        'Denied by CS',
+        'Denied by IS',
+        'Denied by IT'];
 
     const requestId = match.params.id
 
-    const changeDateFormat = (date) => dateformat(date, "mmm d, yyyy h:MMtt")
+    const changeDateFormat = (date) => dateformat(date, 'mmm d, yyyy h:MMtt')
     const upperCase = (text) => text.toUpperCase()
 
     const handleClose = () => setShow(false)
@@ -65,6 +78,12 @@ const UpdateRequest = ({ history, match }) => {
             alert.error(error)
             dispatch(clearErrors())
             window.history.back()
+        }
+
+        if (requestType === 'Cross Enrollment within CICS') {
+            setStatus(crossEnrolStatus)
+        } else {
+            setStatus(normalStatus)
         }
 
         if (isUpdated) {
@@ -320,9 +339,8 @@ const UpdateRequest = ({ history, match }) => {
                                                 <MDBDataTableV5
                                                     data={setAttachments()}
                                                     searchTop
-                                                    pagingTop
                                                     scrollX
-                                                    entriesOptions={[5, 20, 25]}
+                                                    entriesOptions={[5, 10, 15]}
                                                     entries={10}
                                                     style={{ backgroundColor: 'white' }}
                                                 />
@@ -332,9 +350,8 @@ const UpdateRequest = ({ history, match }) => {
                                         <MDBDataTableV5
                                             data={setHistory()}
                                             searchTop
-                                            pagingTop
                                             scrollX
-                                            entriesOptions={[5, 20, 25]}
+                                            entriesOptions={[5, 10, 15]}
                                             entries={10}
                                             style={{ backgroundColor: 'white' }}
                                         />
@@ -354,7 +371,9 @@ const UpdateRequest = ({ history, match }) => {
                                             required
                                         >
                                             <option value=''></option>
-                                            {status.map(status => (
+                                            {requestType && String(requestType).includes('Cross Enrollment within CICS') ? crossEnrolStatus.map(status => (
+                                                <option value={status}>{status}</option>
+                                            )) : normalStatus.map(status => (
                                                 <option value={status}>{status}</option>
                                             ))}
                                         </Form.Select>

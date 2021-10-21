@@ -41,7 +41,16 @@ const requestSchema = new mongoose.Schema({
                 'Pending',
                 'Processing',
                 'Denied',
-                'Approved'
+                'Approved',
+                'Pending for IT Approval',
+                'Pending for IS Approval',
+                'Pending for CS Approval',
+                'Approved by IT',
+                'Approved by IS',
+                'Approved by CS',
+                'Denied by IT',
+                'Denied by IS',
+                'Denied by CS'
             ]
         },
         default: 'Pending'

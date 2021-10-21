@@ -2,28 +2,28 @@ import React, { Fragment, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
-import { Container, Button } from 'react-bootstrap'
+import { Container, Button, Row, Col } from 'react-bootstrap'
 import { MDBDataTableV5 } from 'mdbreact'
-import { getRequests, assignRequest, clearErrors } from '../../../actions/requestActions'
-import { ASSIGN_REQUEST_RESET } from '../../../constants/requestConstants'
+import { getCrossEnrol, updateRequest, clearErrors } from '../../../actions/requestActions'
+import { UPDATE_REQUEST_RESET } from '../../../constants/requestConstants'
 import { INSIDE_DASHBOARD_TRUE } from '../../../constants/dashboardConstants'
 import Sidebar from '../../layout/Sidebar'
 import MetaData from '../../layout/MetaData'
 import Loader from '../../layout/Loader'
 import dateformat from 'dateformat'
 
-const ListAvailableRequests = ({ history }) => {
+const ListOutgoingCrossEnrollment = ({ history }) => {
     const alert = useAlert()
     const dispatch = useDispatch()
 
-    const { loading, requests, error } = useSelector(state => state.requests)
+    const { loading, crossEnrollmentOutgoing, error } = useSelector(state => state.crossEnrollment)
     const { error: updateError, isUpdated } = useSelector(state => state.request)
 
     const changeDateFormat = (date) => dateformat(date, "mmm d, yyyy h:MMtt")
     const upperCase = (text) => text.toUpperCase()
 
     useEffect(() => {
-        dispatch(getRequests('CICS Office', 'Available'))
+        dispatch(getCrossEnrol())
 
         if (error) {
             alert.error(error)
@@ -38,11 +38,11 @@ const ListAvailableRequests = ({ history }) => {
         }
 
         if (isUpdated) {
-            alert.success('Request has been assigned to user successfully.')
-            history.push('/admin/cics/available/requests')
+            alert.success('Request has been moved to Trash successfully.')
+            history.push('/admin/deptchair/crossenrollment/Outgoing')
 
             dispatch({
-                type: ASSIGN_REQUEST_RESET
+                type: UPDATE_REQUEST_RESET
             })
         }
 
@@ -51,8 +51,8 @@ const ListAvailableRequests = ({ history }) => {
         })
     }, [dispatch, history, alert, error, updateError, isUpdated])
 
-    const assignRequestHandler = (id) => {
-        dispatch(assignRequest(id, {}))
+    const updateRequestHandler = (id) => {
+        dispatch(updateRequest(id, { isTrash: true }, true))
     }
 
     const setRequests = () => {
@@ -87,34 +87,29 @@ const ListAvailableRequests = ({ history }) => {
             rows: []
         }
 
-        requests.forEach(request => {
-            const viewType = '3' + request._id
+        crossEnrollmentOutgoing && crossEnrollmentOutgoing.forEach(request => {
+            const viewType = '1' + request._id
 
             data.rows.push({
                 date: changeDateFormat(request.createdAt),
                 requestType: request.requestType,
                 name: request.requestorInfo.firstName + ' ' + request.requestorInfo.lastName,
-                requestStatus: <Fragment>
-                    <p style={{
-                        color: request.requestStatus === 'Pending' ? 'blue' : (
-                            request.requestStatus === 'Processing' ? '#ffcc00' : (
-                                request.requestStatus === 'Denied' ? 'red' : 'green'
-                            )
-                        )
-                    }}>
-                        {upperCase(request.requestStatus)}
-                    </p>
-                </Fragment>,
+                requestStatus: upperCase(request.requestStatus),
                 actions: <Fragment>
                     <Link to={`/view/request/${viewType}`}>
                         <Button variant="primary" className="mr-5" style={{ margin: '5px' }}>
                             <i class="fa fa-eye" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
                         </Button>
                     </Link>
-                    <Button variant="warning" className="mr-5" style={{ margin: '5px' }} onClick={() => {
-                        assignRequestHandler(request._id)
+                    <Link to={`/admin/request/${request._id}`}>
+                        <Button variant="warning" className="mr-5" style={{ margin: '5px' }}>
+                            <i class="fa fa-edit" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
+                        </Button>
+                    </Link>
+                    <Button variant="danger" className="mr-5" style={{ margin: '5px' }} onClick={() => {
+                        updateRequestHandler(request._id)
                     }}>
-                        <i class="fa fa-user" aria-hidden="true" />
+                        <i class="fa fa-trash" aria-hidden="true" />
                     </Button>
                 </Fragment>
             })
@@ -126,16 +121,16 @@ const ListAvailableRequests = ({ history }) => {
 
     return (
         <Fragment>
-            <MetaData title={'Available Requests'} />
+            <MetaData title={'Outgoing Cross Enrollment'} />
             <Sidebar />
             <div className="row">
                 <div className="">
                     <Container fluid style={{ padding: "50px 0px" }}>
-                        <div style={{ display: 'flex', marginBottom: '20px' }}>
-                            <div style={{ marginRight: 'auto', marginTop: '30px' }}>
-                                <h3>Available Requests</h3>
-                            </div>
-                        </div>
+                        <Row style={{ margin: '30px 0 20px 0' }}>
+                            <Col xs={12}>
+                                <h3>Outgoing Cross Enrollment</h3>
+                            </Col>
+                        </Row>
                         {loading ? <Loader /> : (
                             <>
                                 <MDBDataTableV5
@@ -155,4 +150,4 @@ const ListAvailableRequests = ({ history }) => {
     )
 }
 
-export default ListAvailableRequests
+export default ListOutgoingCrossEnrollment

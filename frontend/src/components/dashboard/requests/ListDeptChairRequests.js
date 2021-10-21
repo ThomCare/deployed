@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
-import { Container, Button, ButtonToolbar, ButtonGroup, Row, Col } from 'react-bootstrap'
+import { Container, Button, ButtonToolbar, ButtonGroup, Row, Col, Form } from 'react-bootstrap'
 import { MDBDataTableV5 } from 'mdbreact'
 import { getRequests, updateRequest, clearErrors } from '../../../actions/requestActions'
 import { UPDATE_REQUEST_RESET } from '../../../constants/requestConstants'
@@ -16,7 +16,7 @@ const ListDeptChairRequests = ({ history }) => {
     const alert = useAlert()
     const dispatch = useDispatch()
 
-    const { loading, requests, pending, processing, approved, denied, crossEnrollment, error } = useSelector(state => state.requests)
+    const { loading, requests, pending, processing, approved, denied, error } = useSelector(state => state.requests)
     const { error: updateError, isUpdated } = useSelector(state => state.request)
 
     const [requestList, setRequestList] = useState([])
@@ -44,14 +44,11 @@ const ListDeptChairRequests = ({ history }) => {
             case 'Denied':
                 setRequestList(denied)
                 break
-            case 'Cross Enrollment':
-                setRequestList(crossEnrollment)
-                break
             default:
                 break
         }
 
-    }, [status, requests, pending, processing, approved, denied, crossEnrollment])
+    }, [status, requests, pending, processing, approved, denied])
 
     useEffect(() => {
         dispatch(getRequests('Dept Chair', 'Requests'))
@@ -121,40 +118,41 @@ const ListDeptChairRequests = ({ history }) => {
         requestList && requestList.forEach(request => {
             const viewType = '1' + request._id
 
-            data.rows.push({
-                date: changeDateFormat(request.createdAt),
-                requestType: request.requestType,
-                name: request.requestorInfo.firstName + ' ' + request.requestorInfo.lastName,
-                requestStatus: <Fragment>
-                    <p style={{
-                        color: request.requestStatus === 'Pending' ? 'blue' : (
-                            request.requestStatus === 'Processing' ? '#ffcc00' : (
-                                request.requestStatus === 'Denied' ? 'red' : 'green'
+            if (request.requestType !== 'Cross Enrollment within CICS') {
+                data.rows.push({
+                    date: changeDateFormat(request.createdAt),
+                    requestType: request.requestType,
+                    name: request.requestorInfo.firstName + ' ' + request.requestorInfo.lastName,
+                    requestStatus: <Fragment>
+                        <p style={{
+                            color: request.requestStatus === 'Pending' ? 'blue' : (
+                                request.requestStatus === 'Processing' ? '#ffcc00' : (
+                                    request.requestStatus === 'Denied' ? 'red' : 'green'
+                                )
                             )
-                        )
-                    }}>
-                        {upperCase(request.requestStatus)}
-                    </p>
-                </Fragment>,
-                actions: <Fragment>
-                    <Link to={`/view/request/${viewType}`}>
-                        <Button variant="primary" className="mr-5" style={{ margin: '5px' }}>
-                            <i class="fa fa-eye" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
+                        }}>
+                            {upperCase(request.requestStatus)}
+                        </p>
+                    </Fragment>,
+                    actions: <Fragment>
+                        <Link to={`/view/request/${viewType}`}>
+                            <Button variant="primary" className="mr-5" style={{ margin: '5px' }}>
+                                <i class="fa fa-eye" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
+                            </Button>
+                        </Link>
+                        <Link to={`/admin/request/${request._id}`}>
+                            <Button variant="warning" className="mr-5" style={{ margin: '5px' }}>
+                                <i class="fa fa-edit" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
+                            </Button>
+                        </Link>
+                        <Button variant="danger" className="mr-5" style={{ margin: '5px' }} onClick={() => {
+                            updateRequestHandler(request._id)
+                        }}>
+                            <i class="fa fa-trash" aria-hidden="true" />
                         </Button>
-                    </Link>
-                    <Link to={`/admin/request/${request._id}`}>
-                        <Button variant="warning" className="mr-5" style={{ margin: '5px' }}>
-                            <i class="fa fa-edit" aria-hidden="true" style={{ textDecoration: 'none', color: 'white' }} />
-                        </Button>
-                    </Link>
-                    <Button variant="danger" className="mr-5" style={{ margin: '5px' }} onClick={() => {
-                        updateRequestHandler(request._id)
-                    }}>
-                        <i class="fa fa-trash" aria-hidden="true" />
-                    </Button>
-                </Fragment>
-            })
-
+                    </Fragment>
+                })
+            }
         })
 
         return data
@@ -163,7 +161,7 @@ const ListDeptChairRequests = ({ history }) => {
     return (
         <Fragment>
             <MetaData title={'My Requests'} />
-            <Sidebar />
+            <Sidebar />updat
             <div className="row">
                 <div className="">
                     <Container fluid style={{ padding: "50px 0px" }}>
@@ -179,7 +177,6 @@ const ListDeptChairRequests = ({ history }) => {
                                         <Button variant="outline-secondary" onClick={() => setStatus('Processing')}>Processing</Button>
                                         <Button variant="outline-secondary" onClick={() => setStatus('Approved')}>Approved</Button>
                                         <Button variant="outline-secondary" onClick={() => setStatus('Denied')}>Denied</Button>
-                                        <Button variant="outline-secondary" onClick={() => setStatus('Cross Enrollment')}>Cross Enrollment</Button>
                                     </ButtonGroup>
                                 </ButtonToolbar>
                             </Col>
@@ -189,9 +186,9 @@ const ListDeptChairRequests = ({ history }) => {
                                 <MDBDataTableV5
                                     data={setRequests()}
                                     searchTop
-                                    pagingTop
+                                    searchBottom={false}
                                     scrollX
-                                    entriesOptions={[5, 20, 25]}
+                                    entriesOptions={[10, 20, 30, 40, 50]}
                                     entries={10}
                                 />
                             </>

@@ -396,9 +396,8 @@ const UpdateAnnouncement = ({ history, match }) => {
                                                     {oldAttachments.length !== 0 && <MDBDataTableV5
                                                         data={setAttachments()}
                                                         searchTop
-                                                        pagingTop
                                                         scrollX
-                                                        entriesOptions={[5, 20, 25]}
+                                                        entriesOptions={[10, 20, 30, 40, 50]}
                                                         entries={10}
                                                         style={{ backgroundColor: 'white' }}
                                                     />}

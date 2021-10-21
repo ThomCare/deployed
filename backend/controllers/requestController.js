@@ -258,7 +258,7 @@ exports.getDeptChairRequests = catchAsyncErrors(async (req, res, next) => {
         weeklyStats.push(x.length)
     }
 
-    const dates = [0, 1,7,30,60]
+    const dates = [0, 1, 7, 30, 60]
     const overViewDates = []
     const overViewStats = []
 
@@ -372,7 +372,7 @@ exports.getAllRequests = catchAsyncErrors(async (req, res, next) => {
         weeklyStats.push(x.length)
     }
 
-    const dates = [0, 1,7,30,60]
+    const dates = [0, 1, 7, 30, 60]
     const overViewDates = []
     const overViewStats = []
 
@@ -659,7 +659,7 @@ exports.assignRequestToSelfCICS = catchAsyncErrors(async (req, res, next) => {
     let request = await Request.findById(req.params.requestId);
 
     if (!request) { return next(new ErrorHandler(`Request does not exist with this id:(${req.params.requestId})`)) }
-    if(request.managedBy != ""){
+    if (request.managedBy != "") {
         return next(new ErrorHandler(`This request is already been assigned to a CICS Office`))
     }
 
@@ -820,4 +820,48 @@ exports.unassignRequest = catchAsyncErrors(async (req, res, next) => {
         message: `Request has been unassigned by ${req.user.email}`
     })
 
+})
+
+exports.getCrossEnrollment = catchAsyncErrors(async (req, res, next) => {
+    const reqStatusIT = ['Pending for IT Approval', 'Approved by IT', 'Denied by IT'];
+    const reqStatusIS = ['Pending for IS Approval', 'Approved by IS', 'Denied by IS'];
+    const reqStatusCS = ['Pending for CS Approval', 'Approved by CS', 'Denied by CS'];
+    let deptCourse = '', crossStatus = []
+    
+    switch (req.user.role) {
+        case 'IT Dept Chair':
+            crossStatus = reqStatusIT
+            deptCourse = 'Information Technology'
+            break
+        case 'IS Dept Chair':
+            crossStatus = reqStatusIS
+            deptCourse = 'Information Systems'
+            break
+        case 'CS Dept Chair':
+            crossStatus = reqStatusCS
+            deptCourse = 'Computer Science'
+            break
+        case 'CICS Office':
+        case 'Student':
+            return next(new ErrorHandler('Role does not have access to this resource'))
+    }
+
+    const getCrossEnrollmentOutgoing = new APIFeatures(Request.find({ isTrash: false, requestType: 'Cross Enrollment within CICS', requestStatus: { $in: crossStatus } })
+        .sort({ createdAt: -1 }), req.query)
+        .searchRequests()
+        .filter()
+
+    const getCrossEnrollmentIncoming = new APIFeatures(Request.find({ "requestorInfo.course": deptCourse, isTrash: false, requestType: 'Cross Enrollment within CICS' })
+        .sort({ createdAt: -1 }), req.query)
+        .searchRequests()
+        .filter()
+
+    const crossEnrollmentIncoming = await getCrossEnrollmentIncoming.query
+    const crossEnrollmentOutgoing = await getCrossEnrollmentOutgoing.query
+
+    res.status(200).json({
+        success: true,
+        crossEnrollmentOutgoing,
+        crossEnrollmentIncoming
+    })
 })

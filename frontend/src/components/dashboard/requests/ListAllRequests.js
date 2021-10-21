@@ -20,6 +20,28 @@ const ListAllRequests = ({ history }) => {
 
     const [requestList, setRequestList] = useState([])
     const [status, setStatus] = useState('Requests')
+    const [searchButton, setSearchButton] = useState(1)
+    const [filter, setFilter] = useState({
+        requestType: ''
+    })
+    const requestTypes = [
+        'Adding/Dropping of Course',
+        'Cross Enrollment within CICS',
+        'Cross Enrollment outside CICS',
+        'Request for Petition Classes within CICS',
+        'Request for Crediting of Courses',
+        'Request for Overload',
+        'Request to Override',
+        'Request for Late Enrollment',
+        'Request for Manual Enrollment',
+        'Request for Course Description',
+        'Request for Certificate of Grades',
+        'Request for Leave of Absence',
+        'Submission of Admission Memo',
+        'Others'
+    ]
+
+    const { requestType } = filter
 
     const changeDateFormat = (date) => dateformat(date, "mmm d, yyyy h:MMtt")
     const upperCase = (text) => text.toUpperCase()
@@ -156,9 +178,9 @@ const ListAllRequests = ({ history }) => {
                                 <MDBDataTableV5
                                     data={setRequests()}
                                     searchTop
-                                    pagingTop
+                                    searchBottom={false}
                                     scrollX
-                                    entriesOptions={[5, 20, 25]}
+                                    entriesOptions={[10, 20, 30, 40, 50]}
                                     entries={10}
                                 />
                             </>
