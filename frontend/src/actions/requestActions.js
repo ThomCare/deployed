@@ -15,9 +15,9 @@ import {
     GET_CROSSENROL_REQUEST,
     GET_CROSSENROL_SUCCESS,
     GET_CROSSENROL_FAIL,
-    GET_RECENT_REQUEST,
-    GET_RECENT_SUCCESS,
-    GET_RECENT_FAIL,
+    REQUEST_STATS_REQUEST,
+    REQUEST_STATS_SUCCESS,
+    REQUEST_STATS_FAIL,
     UPDATE_REQUEST_REQUEST,
     UPDATE_REQUEST_SUCCESS,
     UPDATE_REQUEST_FAIL,
@@ -90,7 +90,7 @@ export const submitRequest = (request) => async (dispatch) => {
 }
 
 //get requests
-export const getRequests = (role, route) => async (dispatch) => {
+export const getRequests = (role, route, requestType) => async (dispatch) => {
     try {
         dispatch({
             type: GET_REQUESTS_REQUEST
@@ -101,32 +101,32 @@ export const getRequests = (role, route) => async (dispatch) => {
         if (role === 'CICS Office') {
             switch (route) {
                 case 'Office':
-                    link = `/api/v1/admin/cics/office/requests`
+                    link = `/api/v1/admin/cics/office/requests${requestType ? `?requestType=${requestType}` : ''}`
                     break
                 case 'Trash':
-                    link = `/api/v1/admin/requests/trash`
+                    link = `/api/v1/admin/requests/trash${requestType ? `?requestType=${requestType}` : ''}`
                     break
                 case 'Available':
-                    link = `/api/v1/admin/cics/available/requests`
+                    link = `/api/v1/admin/cics/available/requests${requestType ? `?requestType=${requestType}` : ''}`
                     break
                 case 'All':
-                    link = `/api/v1/admin/cics/all/requests`
+                    link = `/api/v1/admin/cics/all/requests${requestType ? `?requestType=${requestType}` : ''}`
                     break
                 case 'Me':
-                    link = `/api/v1/admin/cics/me/requests`
+                    link = `/api/v1/admin/cics/me/requests${requestType ? `?requestType=${requestType}` : ''}`
                     break
                 default:
                     link = ``
             }
         } else if (role === 'Student') { //student
-            link = `/api/v1/me/requests`
+            link = `/api/v1/me/requests${requestType ? `?requestType=${requestType}` : ''}`
         } else {
             switch (route) {
                 case 'Trash':
-                    link = `/api/v1/admin/requests/trash`
+                    link = `/api/v1/admin/requests/trash${requestType ? `?requestType=${requestType}` : ''}`
                     break
                 case 'Requests':
-                    link = `/api/v1/admin/deptChair/requests`
+                    link = `/api/v1/admin/deptChair/requests${requestType ? `?requestType=${requestType}` : ''}`
                     break
                 default:
                     link = ``
@@ -148,6 +148,35 @@ export const getRequests = (role, route) => async (dispatch) => {
     }
 }
 
+//get stats
+export const getStats = (role) => async (dispatch) => {
+    try {
+        dispatch({
+            type: REQUEST_STATS_REQUEST
+        })
+
+        let link = ''
+
+        if (role === 'CICS Office') {
+            link = `/api/v1/admin/cics/stats`
+        } else {
+            link = `/api/v1/admin/deptChair/stats`
+        }
+        
+        const { data } = await axios.get(link)
+
+        dispatch({
+            type: REQUEST_STATS_SUCCESS,
+            payload: data
+        })
+    }
+    catch (error) {
+        dispatch({
+            type: REQUEST_STATS_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
 
 //get requests
 export const getCrossEnrol = () => async (dispatch) => {
@@ -188,38 +217,6 @@ export const getRequestDetails = (requestId) => async (dispatch) => {
     catch (error) {
         dispatch({
             type: REQUEST_DETAILS_FAIL,
-            payload: error.response.data.message
-        })
-    }
-}
-
-//get recent requests
-export const getRecent = (role) => async (dispatch) => {
-    try {
-        dispatch({
-            type: GET_RECENT_REQUEST
-        })
-
-        let link = ``
-
-        if (role === 'CICS Office') {
-            link = `/api/v1/admin/cics/all/requests`
-        } else if (role === 'Student') { //student
-            link = `/api/v1/me/requests`
-        } else {
-            link = `/api/v1/admin/deptChair/requests`
-        }
-
-        const { data } = await axios.get(link)
-
-        dispatch({
-            type: GET_RECENT_SUCCESS,
-            payload: data.recents
-        })
-    }
-    catch (error) {
-        dispatch({
-            type: GET_RECENT_FAIL,
             payload: error.response.data.message
         })
     }
@@ -325,13 +322,13 @@ export const unassignRequest = (requestId, request) => async (dispatch) => {
 }
 
 //delete request
-export const deleteRequest = (requestId) => async (dispatch) => {
+export const deleteRequest = (requestId, emptyTrash) => async (dispatch) => {
     try {
         dispatch({
             type: DELETE_REQUEST_REQUEST
         })
 
-        const { data } = await axios.delete(`/api/v1/delete/${requestId}`)
+        const { data } = await axios.delete(`/api/v1/delete/${requestId}/${emptyTrash}`)
 
         dispatch({
             type: DELETE_REQUEST_SUCCESS,

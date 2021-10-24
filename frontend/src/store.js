@@ -11,10 +11,11 @@ import {
 } from './reducers/userReducers'
 
 import {
-    conversationReducer,
+    getConversationsReducer,
     messageReducer,
     sendMessageReducer,
-    createConversationReducer
+    createConversationReducer,
+    conversationReducer
 } from './reducers/chatReducers'
 
 import {
@@ -31,7 +32,7 @@ import {
     getRequestDetailsReducer,
     getRequestsReducer,
     getCrossEnrollReducer,
-    getRecentReducer,
+    getStatsReducer,
     submitRequestReducer,
     requestReducer
 } from './reducers/requestReducer'
@@ -48,7 +49,8 @@ import {
 } from './reducers/dashboardReducers'
 
 import {
-    auditLogsReducer
+    auditLogsReducer,
+    newAuditReducer
 } from './reducers/auditReducers'
 
 import {
@@ -65,7 +67,8 @@ const reducer = combineReducers({
     singleUser: userDetailsReducer, //get single user details
     user: userReducer, //update and delete profile
 
-    conversations: conversationReducer, //get all conversations of user
+    conversations: getConversationsReducer, //get all conversations of user
+    conversation: conversationReducer, //delete conversation of user
     messages: messageReducer, //get all messages in conversation
     sendMessage: sendMessageReducer, //send message in conversation
     createConvo: createConversationReducer, //for creating conversation with a user
@@ -84,15 +87,17 @@ const reducer = combineReducers({
     requestDetails: getRequestDetailsReducer, //get single request details
     requests: getRequestsReducer, //get all requests
     crossEnrollment: getCrossEnrollReducer,
-    recents: getRecentReducer,
     submitRequest: submitRequestReducer,
-    request: requestReducer,
+    request: requestReducer, //update delete request
+    stats: getStatsReducer, //get stats requests
 
     courses: getCoursesReducer, //get all courses details
     course: courseReducer, // update delete course
     courseDetails: getCourseDetailsReducer, // get course details
     newCourse: newCourseReducer, // update delete course
+    
     audits: auditLogsReducer, //get all audits
+    audit: newAuditReducer, //get all audits
 
     form: formReducer, // update delete form
     forms: formsReducer, // get all forms

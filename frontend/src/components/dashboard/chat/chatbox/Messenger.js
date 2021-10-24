@@ -36,10 +36,10 @@ const Messenger = ({ history }) => {
     const [users, setUsers] = useState([])
     const [createConvoClicked, setCreateConvoClicked] = useState(0)
     const [clicked, setClicked] = useState(0)
-    const [show, setShow] = useState(false);
+    const [show, setShow] = useState(false)
 
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const handleClose = () => setShow(false)
+    const handleShow = () => setShow(true)
     const name = user && user.firstName + ' ' + user.lastName
     const imglink = 'https://res.cloudinary.com/dwcxehcui/image/upload/v1632063359/logo/default_w0escb.png'
 
@@ -85,7 +85,7 @@ const Messenger = ({ history }) => {
                     type: ALL_CONVERSATIONS_REQUEST
                 })
 
-                const { data } = await axios.get(`/api/v1/convo/${id}?${name ? `keyword=${name}` : ``}`)
+                const { data } = await axios.get(`/api/v1/conversations/${id}${name ? `?keyword=${name}` : ``}`)
 
                 dispatch({
                     type: ALL_CONVERSATIONS_SUCCESS,
@@ -113,7 +113,7 @@ const Messenger = ({ history }) => {
                 dispatch({
                     type: ALL_MESSAGES_REQUEST
                 })
-                const { data } = await axios.get(`/api/v1/getMsg/${id}`)
+                const { data } = await axios.get(`/api/v1/message/${id}`)
 
                 setMessageList(data.messages)
                 dispatch({
@@ -236,8 +236,8 @@ const Messenger = ({ history }) => {
     useEffect(() => {
         arrivalMessage &&
             currentChat?.members.includes(arrivalMessage.sender) &&
-            setMessageList((prev) => [...prev, arrivalMessage]);
-    }, [arrivalMessage, currentChat]);
+            setMessageList((prev) => [...prev, arrivalMessage])
+    }, [arrivalMessage, currentChat])
 
     useEffect(() => {
         //send something to socket server
@@ -314,7 +314,7 @@ const Messenger = ({ history }) => {
                                             setCurrentChat(c)
                                             setUserName(c.names[0] === name ? c.names[1] : c.names[0])
                                         }}>
-                                            <Conversation receiverName={c.names[0] === name ? c.names[1] : c.names[0]} />
+                                            <Conversation conversation={c} currentUser={user} />
                                         </div>
                                     </Fragment>
                                 ))

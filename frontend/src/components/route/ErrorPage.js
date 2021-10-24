@@ -10,7 +10,7 @@ const Error = () => {
         dispatch({
             type: INSIDE_DASHBOARD_TRUE
         })
-    }, [])
+    }, [dispatch])
 
     return (
         <div id="notfound">
@@ -20,7 +20,7 @@ const Error = () => {
                 </div>
                 <h2>We encountered an error!</h2>
                 <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
-                <p>Reload the page to continue.</p>
+                <p>Go back home to continue.</p>
                 <a href="/">home page</a>
             </div>
         </div>
