@@ -391,7 +391,7 @@ const SubmitRequest = () => {
                                     <Card.Text>7. Attach the required documents.</Card.Text>
                                     <Card.Text>8. Click the 'Submit' button.</Card.Text>
                                     <hr />
-                                    <Card.Text>For other requests <strong>not available</strong> in the Generate Forms page, go to <Link to='/downloadable/forms/list'>Downloadable Forms</Link> page.</Card.Text>
+                                    <Card.Text>For other requests <strong>not available</strong> in the Generate Forms page, go to <Link to='/download/forms/list'>Downloadable Forms</Link> page.</Card.Text>
                                     <Card.Text>1. Select form to download.</Card.Text>
                                     <Card.Text>2. Fill out the fields in the document.</Card.Text>
                                     <Card.Text>3. Submit the document by filling out the <strong>Submit Request</strong> form.</Card.Text>
